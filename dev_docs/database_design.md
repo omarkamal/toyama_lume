@@ -16,19 +16,49 @@ Employees and admins.
 
 ---
 
+## `tasks`
+Task templates and user-specific tasks for auto-suggestion.
+- `id` (bigint, PK)
+- `title` (string) → "Fix login bug", "Design dashboard", etc.
+- `description` (text, optional) → detailed task description
+- `category` (string, optional) → "development", "design", "meeting", "admin"
+- `priority` (string, default: "medium") → "high", "medium", "low"
+- `estimated_hours` (decimal, optional)
+- `user_id` (bigint, FK → users.id, nullable) → null for global tasks
+- `is_global` (boolean, default: false) → company-wide tasks
+- `status` (string, default: "active") → "active", "archived"
+- `usage_count` (integer, default: 0) → tracks popularity for smart suggestions
+
+> Can belong to a user (personal tasks) or be global (team templates).
+
+---
+
+## `work_log_tasks`
+Join table connecting daily work logs with specific tasks.
+- `id` (bigint, PK)
+- `work_log_id` (bigint, FK → work_logs.id)
+- `task_id` (bigint, FK → tasks.id)
+- `duration_minutes` (integer, optional) → time spent on this specific task
+- `status` (string) → "planned", "in_progress", "completed"
+- `notes` (text, optional) → task-specific notes
+
+> Connects work logs to tasks, enabling detailed time tracking.
+
+---
+
 ## `work_logs`
-Daily punch-in/out + intent/reflection + mood.
+Daily punch-in/out + optional free-text notes + mood.
 - `id` (bigint, PK)
 - `user_id` (bigint, FK → users.id)
 - `punch_in_at` (datetime)
 - `punch_out_at` (datetime, nullable)
-- `planned_work` (text) → "Today I’ll work on…"
-- `completed_work` (text, nullable) → "Today I completed…"
+- `planned_work` (text, optional) → "Today I'll work on…" (fallback)
+- `completed_work` (text, optional) → "Today I completed…" (fallback)
 - `mood` (string, nullable) → "happy", "neutral", or "sad"
 - `location_lat` (decimal, nullable)
 - `location_lng` (decimal, nullable)
 
-> Belongs to one user. One log per workday.
+> Belongs to one user. One log per workday. Primary task tracking via work_log_tasks.
 
 ---
 
@@ -72,8 +102,11 @@ Company policy documents.
 ---
 
 ## Relationships Summary
-- `User` → has many → `WorkLog`, `LeaveRequest`
+- `User` → has many → `WorkLog`, `LeaveRequest`, `Task` (personal), `WorkLogTask` (through work logs)
 - `User` (admin) → can approve → `LeaveRequest` (via `approved_by_id`)
-- `WorkLog`, `LeaveRequest`, `Holiday`, `Policy` → standalone or user-scoped, no complex joins
+- `User` (admin) → can manage → global `Task` templates
+- `WorkLog` → has many → `WorkLogTask`
+- `Task` → has many → `WorkLogTask`
+- `WorkLogTask` → belongs to → `WorkLog`, `Task`
 
-> No asset tracking, teams, or departments in MVP.
+> Enhanced task tracking enables detailed time analysis while maintaining simplicity.
