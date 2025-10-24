@@ -1,0 +1,63 @@
+# Company Holidays for Toyama Team
+# Format: name: "Holiday Name", date: "YYYY-MM-DD", company_only: true/false
+
+company_holidays:
+  - name: "Company Founding Day"
+    date: "2024-03-15"
+    company_only: true
+  - name: "Team Building Day"
+    date: "2024-06-20"
+    company_only: true
+  - name: "Company Anniversary"
+    date: "2024-09-01"
+    company_only: true
+
+national_holidays_japan:
+  - name: "New Year's Day"
+    date: "2024-01-01"
+    company_only: false
+  - name: "Coming of Age Day"
+    date: "2024-01-08"
+    company_only: false
+  - name: "National Foundation Day"
+    date: "2024-02-11"
+    company_only: false
+  - name: "Emperor's Birthday"
+    date: "2024-02-23"
+    company_only: false
+  - name: "Vernal Equinox Day"
+    date: "2024-03-20"
+    company_only: false
+  - name: "Showa Day"
+    date: "2024-04-29"
+    company_only: false
+  - name: "Constitution Memorial Day"
+    date: "2024-05-03"
+    company_only: false
+  - name: "Greenery Day"
+    date: "2024-05-04"
+    company_only: false
+  - name: "Children's Day"
+    date: "2024-05-05"
+    company_only: false
+  - name: "Marine Day"
+    date: "2024-07-15"
+    company_only: false
+  - name: "Mountain Day"
+    date: "2024-08-11"
+    company_only: false
+  - name: "Respect for the Aged Day"
+    date: "2024-09-16"
+    company_only: false
+  - name: "Autumnal Equinox Day"
+    date: "2024-09-22"
+    company_only: false
+  - name: "Sports Day"
+    date: "2024-10-14"
+    company_only: false
+  - name: "Culture Day"
+    date: "2024-11-03"
+    company_only: false
+  - name: "Labor Thanksgiving Day"
+    date: "2024-11-23"
+    company_only: false

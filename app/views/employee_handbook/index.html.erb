@@ -1,0 +1,150 @@
+<% content_for :title, "Employee Handbook" %>
+
+<div class="min-h-screen bg-carbon-light">
+  <!-- Header -->
+  <div class="bg-white border-b border-cloudy px-4 py-4 sm:px-6">
+    <div class="flex items-center gap-4">
+      <%= link_to root_path, class: "inline-flex items-center gap-2 text-carbon-heavy/60 hover:text-navy transition-colors" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span class="text-sm font-body font-normal">Back to Dashboard</span>
+      <% end %>
+
+      <div class="flex-1">
+        <h1 class="text-xl font-heading font-medium text-navy">Employee Handbook</h1>
+        <p class="text-carbon-heavy/60 text-sm font-body font-light">
+          Company policies and procedures
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto px-4 py-6">
+    <!-- Introduction Card -->
+    <div class="bg-white rounded-xl border border-cloudy shadow-sm p-6 mb-6">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 bg-navy/10 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h2 class="text-lg font-heading font-medium text-navy mb-2">Welcome to the Employee Handbook</h2>
+          <p class="text-sm text-carbon-heavy/70 mb-4">
+            This handbook contains important information about company policies, procedures, and guidelines. Please review all sections carefully and feel free to reach out to HR if you have any questions.
+          </p>
+          <div class="flex items-center gap-6 text-sm text-carbon-heavy/60">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span><%= @handbook_documents.count %> Documents</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              <span>PDF Format</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documents Grid -->
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <% @handbook_documents.each do |document| %>
+        <div class="bg-white rounded-xl border border-cloudy shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group">
+          <div class="p-6">
+            <!-- Document Header -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-navy/10 group-hover:bg-navy/20 rounded-lg flex items-center justify-center transition-colors">
+                  <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-body font-medium text-navy bg-navy/10 px-2 py-1 rounded">
+                    Document <%= document[:number] %>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Document Title -->
+            <h3 class="text-base font-heading font-medium text-navy mb-3 line-clamp-2">
+              <%= document[:name] %>
+            </h3>
+
+            <!-- Action Button -->
+            <%#= debug "Document filename: #{document[:filename]}" %>
+            <%#= debug "Generated URL: #{handbook_document_path(document[:filename])}" %>
+            <%= link_to handbook_document_path(document[:filename]),
+                class: "w-full bg-navy hover:bg-navy/90 text-white px-4 py-3 rounded-lg text-sm font-body font-normal transition-colors flex items-center justify-center gap-2 group",
+                data: { turbo_frame: "_top" } do %>
+              <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+              <span>View Document</span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Quick Access Section -->
+    <div class="mt-8 bg-white rounded-xl border border-cloudy shadow-sm p-6">
+      <h3 class="text-lg font-heading font-medium text-navy mb-4">Quick Access</h3>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <%
+        # Popular documents based on common HR needs
+        popular_docs = [
+          'Code of Conduct',
+          'Leave Policy & Approval',
+          'Attendance and Timing Policy',
+          'Attendance and Leaves',
+          'Remuneration & Increments'
+        ]
+        %>
+
+        <% popular_docs.each do |doc_name| %>
+          <% document = @handbook_documents.find { |d| d[:name].include?(doc_name) } %>
+          <% if document %>
+            <%= link_to handbook_document_path(document[:filename]),
+                class: "flex items-center gap-3 p-3 rounded-lg border border-cloudy hover:bg-carbon-light transition-colors group",
+                data: { turbo_frame: "_top" } do %>
+              <div class="w-8 h-8 bg-teal/10 group-hover:bg-teal/20 rounded-lg flex items-center justify-center transition-colors">
+                <svg class="w-4 h-4 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-body font-medium text-navy truncate">
+                  <%= document[:name] %>
+                </div>
+                <div class="text-xs text-carbon-heavy/60">Document <%= document[:number] %></div>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="mt-6 p-6 bg-carbon-light rounded-xl">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-carbon-heavy/60 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+          <h4 class="text-sm font-heading font-medium text-navy mb-1">Need Help?</h4>
+          <p class="text-sm text-carbon-heavy/70">
+            If you have any questions about the policies or procedures outlined in this handbook, please contact the HR team or your manager for clarification.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

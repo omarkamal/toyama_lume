@@ -93,41 +93,41 @@
 
     <!-- Company Info Section -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-      <!-- Company Policies Card (Future Feature) -->
-      <div class="bg-white p-4 rounded-xl border border-cloudy shadow-sm opacity-60 cursor-not-allowed">
+      <!-- Employee Handbook Card -->
+      <%= link_to employee_handbook_path, class: "bg-white p-4 rounded-xl border border-cloudy shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group" do %>
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-12 h-12 bg-navy/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-navy/20 transition-colors">
+            <svg class="w-6 h-6 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
           <div class="flex-1">
-            <h3 class="font-body font-normal text-gray-600 text-sm mb-1">Company Policies</h3>
-            <p class="text-xs text-gray-400">Access employee handbook and policies</p>
+            <h3 class="font-body font-normal text-navy text-sm mb-1">Employee Handbook</h3>
+            <p class="text-xs text-carbon-heavy/60">Company policies & procedures</p>
           </div>
-          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-carbon-heavy/60 group-hover:text-navy transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
-      </div>
+      <% end %>
 
-      <!-- Holidays Card (Future Feature) -->
-      <div class="bg-white p-4 rounded-xl border border-cloudy shadow-sm opacity-60 cursor-not-allowed">
+      <!-- Holidays Card -->
+      <%= link_to holidays_path, class: "bg-white p-4 rounded-xl border border-cloudy shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group" do %>
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-12 h-12 bg-orange/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-orange/20 transition-colors">
+            <svg class="w-6 h-6 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <div class="flex-1">
-            <h3 class="font-body font-normal text-gray-600 text-sm mb-1">Holidays</h3>
-            <p class="text-xs text-gray-400">View company and national holidays</p>
+            <h3 class="font-body font-normal text-navy text-sm mb-1">Holidays</h3>
+            <p class="text-xs text-carbon-heavy/60">Company & national holidays</p>
           </div>
-          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-carbon-heavy/60 group-hover:text-navy transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
-      </div>
+      <% end %>
     </div>
 
     <!-- Current Session Status -->

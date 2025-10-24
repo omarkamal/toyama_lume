@@ -46,6 +46,11 @@ Rails.application.routes.draw do
     end
   end
 
+  # Static Content
+  get "holidays", to: "holidays#index"
+  get "employee-handbook", to: "employee_handbook#index"
+  get "employee-handbook/:document", to: "employee_handbook#show", as: :handbook_document
+
   # Admin panel
   namespace :admin do
     root "dashboard#index"

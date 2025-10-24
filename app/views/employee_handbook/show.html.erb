@@ -1,0 +1,141 @@
+<% content_for :title, @document[:name] %>
+
+<div class="min-h-screen bg-carbon-light">
+  <!-- Header -->
+  <div class="bg-white border-b border-cloudy px-4 py-4 sm:px-6">
+    <div class="flex items-center gap-4">
+      <%= link_to employee_handbook_path, class: "inline-flex items-center gap-2 text-carbon-heavy/60 hover:text-navy transition-colors" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span class="text-sm font-body font-normal">Back to Handbook</span>
+      <% end %>
+
+      <div class="flex-1">
+        <h1 class="text-xl font-heading font-medium text-navy"><%= @document[:name] %></h1>
+        <p class="text-carbon-heavy/60 text-sm font-body font-light">
+          Document <%= @document[:number] %> • Employee Handbook
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <%= link_to @document[:url],
+            target: "_blank",
+            class: "inline-flex items-center gap-2 px-4 py-2 bg-navy hover:bg-navy/90 text-white rounded-lg text-sm font-body font-normal transition-colors" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>Download</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    <!-- PDF Viewer -->
+    <div class="bg-white rounded-xl border border-cloudy shadow-sm overflow-hidden">
+      <!-- Viewer Header -->
+      <div class="border-b border-cloudy px-6 py-4 bg-gray-50">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-heading font-medium text-navy">Document Viewer</h2>
+              <p class="text-sm text-carbon-heavy/60">
+                <%= @document[:name] %> • PDF Format
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-carbon-heavy/60 bg-white px-3 py-1 rounded-full border border-cloudy">
+              <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Best viewed in fullscreen
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PDF iframe -->
+      <div class="relative bg-gray-100" style="height: 80vh; min-height: 600px;">
+        <!-- Loading indicator -->
+        <div id="pdf-loading" class="absolute inset-0 flex items-center justify-center bg-white z-10">
+          <div class="text-center">
+            <div class="w-12 h-12 border-4 border-navy/20 border-t-navy rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-sm text-carbon-heavy/60">Loading document...</p>
+          </div>
+        </div>
+
+        <!-- PDF iframe with fallback -->
+        <iframe
+          src="<%= @document[:url] %>"
+          class="w-full h-full border-0"
+          title="<%= @document[:name] %>"
+          onload="document.getElementById('pdf-loading').style.display='none'"
+          onerror="handlePdfError()"
+          id="pdf-viewer">
+        </iframe>
+
+        <!-- Fallback message -->
+        <div id="pdf-error" class="hidden absolute inset-0 flex items-center justify-center bg-white">
+          <div class="text-center max-w-md mx-auto p-6">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-heading font-medium text-navy mb-2">PDF Viewer Unavailable</h3>
+            <p class="text-sm text-carbon-heavy/70 mb-4">
+              Your browser doesn't support inline PDF viewing. Please download the document to view it.
+            </p>
+            <%= link_to @document[:url],
+                target: "_blank",
+                class: "inline-flex items-center gap-2 px-4 py-2 bg-navy hover:bg-navy/90 text-white rounded-lg text-sm font-body font-normal transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Download PDF</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Info -->
+    <div class="mt-6 bg-white rounded-xl border border-cloudy shadow-sm p-6">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-carbon-heavy/60 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+          <h4 class="text-sm font-heading font-medium text-navy mb-1">Navigation Tips</h4>
+          <ul class="text-sm text-carbon-heavy/70 space-y-1">
+            <li>• Use your browser's built-in PDF controls to zoom, navigate pages, and search</li>
+            <li>• Click the download button to save the document for offline viewing</li>
+            <li>• Most browsers support fullscreen viewing for better readability</li>
+            <li>• If the viewer doesn't load properly, try refreshing the page or downloading the file</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function handlePdfError() {
+  document.getElementById('pdf-loading').style.display = 'none';
+  document.getElementById('pdf-error').classList.remove('hidden');
+}
+
+// Hide loading indicator after a timeout (fallback)
+setTimeout(function() {
+  document.getElementById('pdf-loading').style.display = 'none';
+}, 5000);
+</script>
