@@ -21,9 +21,49 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="bg-gray-50">
+    <% if logged_in? %>
+      <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex">
+              <div class="flex-shrink-0 flex items-center">
+                <%= link_to "Lume", root_path, class: "text-xl font-semibold text-gray-900" %>
+              </div>
+              <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                <%= link_to "Dashboard", root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path == root_path ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} text-sm font-medium" %>
+                <%= link_to "My Tasks", my_tasks_tasks_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path == my_tasks_tasks_path ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} text-sm font-medium" %>
+                <%= link_to "Work Logs", work_logs_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path == work_logs_path ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} text-sm font-medium" %>
+                <% if current_user.admin? %>
+                  <%= link_to "Admin", admin_root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path.start_with?(admin_root_path) ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} text-sm font-medium" %>
+                <% end %>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <span class="text-sm text-gray-700 mr-4">Hi, <%= current_user.name %>!</span>
+              <%= button_to "Logout", logout_path, method: :delete, class: "bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium" %>
+            </div>
+          </div>
+        </div>
+      </nav>
+    <% end %>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <% if flash.any? %>
+        <div class="mb-4 space-y-2">
+          <% flash.each do |type, message| %>
+            <div class="<%= flash_class(type) %> rounded-md p-4 flex items-center justify-between">
+              <div><%= message %></div>
+              <button onclick="this.parentElement.remove()" class="ml-4 text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </main>
   </body>
 </html>

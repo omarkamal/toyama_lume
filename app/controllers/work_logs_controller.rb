@@ -1,0 +1,186 @@
+class WorkLogsController < ApplicationController
+  before_action :require_login
+
+  def index
+    @work_logs = current_user.work_logs.order(punch_in: :desc).page(params[:page])
+  end
+
+  def show
+    @work_log = current_user.work_logs.find(params[:id])
+  end
+
+  def punch_in
+    # Check if user already has an active work log
+    active_work_log = current_user.work_logs.where(punch_out: nil).first
+
+    if active_work_log
+      redirect_to root_path, alert: "You're already punched in!"
+      return
+    end
+
+    if request.post?
+      # Handle form submission
+      @work_log = current_user.work_logs.new(
+        punch_in: Time.current,
+        mood: params[:work_log][:mood],
+        location_lat: params[:location_lat],
+        location_lng: params[:location_lng]
+      )
+
+      # Validate location is present
+      if params[:location_lat].blank? || params[:location_lng].blank?
+        @work_log.errors.add(:base, "Location is required to punch in")
+        render turbo_stream: turbo_stream.replace("punch_in_modal", partial: "work_logs/punch_in_modal")
+        return
+      end
+
+      # Validate geofencing
+      unless within_work_zone?(params[:location_lat], params[:location_lng])
+        @work_log.errors.add(:base, "You are outside of approved work zones. Please punch in from an authorized location.")
+        render turbo_stream: turbo_stream.replace("punch_in_modal", partial: "work_logs/punch_in_modal")
+        return
+      end
+
+      if @work_log.save
+        # Add selected tasks
+        if params[:work_log][:task_ids].present?
+          params[:work_log][:task_ids].each do |task_id|
+            next if task_id.blank?
+            task = Task.find(task_id)
+            @work_log.work_log_tasks.create!(task: task, status: :planned)
+          end
+        end
+
+        # Add custom task if provided
+        if params[:custom_task].present?
+          custom_task = current_user.tasks.create!(
+            title: params[:custom_task],
+            category: "Custom",
+            priority: :medium,
+            is_global: false
+          )
+          @work_log.work_log_tasks.create!(task: custom_task, status: :planned)
+        end
+
+        redirect_to root_path, notice: "Successfully punched in!"
+      else
+        render turbo_stream: turbo_stream.replace("punch_in_modal", partial: "work_logs/punch_in_modal")
+      end
+    else
+      # Show modal
+      @work_log = current_user.work_logs.new
+      render turbo_stream: turbo_stream.update("punch_in_modal", partial: "work_logs/punch_in_modal")
+    end
+  end
+
+  def punch_out
+    @work_log = current_user.work_logs.where(punch_out: nil).first
+
+    unless @work_log
+      redirect_to root_path, alert: "You're not currently punched in!"
+      return
+    end
+
+    # Always show modal first (GET request)
+    render turbo_stream: turbo_stream.update("punch_out_modal", partial: "work_logs/punch_out_modal")
+  end
+
+  def add_task
+    @work_log = current_user.work_logs.find(params[:id])
+    @task = Task.find(params[:task_id])
+
+    # Check if task is already added to this work log
+    if @work_log.tasks.include?(@task)
+      redirect_to root_path, alert: "Task is already added to this session."
+      return
+    end
+
+    # Create work_log_task association
+    work_log_task = @work_log.work_log_tasks.create!(
+      task: @task,
+      status: :planned
+    )
+
+    if work_log_task.persisted?
+      redirect_to root_path, notice: "Successfully added '#{@task.title}' to your session!"
+    else
+      redirect_to root_path, alert: "Failed to add task to session."
+    end
+  end
+
+  def new_task
+    @work_log = current_user.work_logs.find(params[:id])
+    @suggested_tasks = Task.suggested_for(current_user, limit: 5)
+
+    render turbo_stream: turbo_stream.update("task_modal", partial: "work_logs/task_modal")
+  end
+
+  def complete_punch_out
+    @work_log = current_user.work_logs.find(params[:id])
+
+    if @work_log.punch_out.present?
+      redirect_to root_path, alert: "You've already punched out!"
+      return
+    end
+
+    # Validate location is present
+    if params[:location_lat].blank? || params[:location_lng].blank?
+      @work_log.errors.add(:base, "Location is required to punch out")
+      render turbo_stream: turbo_stream.replace("punch_out_modal", partial: "work_logs/punch_out_modal")
+      return
+    end
+
+    # Validate geofencing
+    unless within_work_zone?(params[:location_lat], params[:location_lng])
+      @work_log.errors.add(:base, "You are outside of approved work zones. Please punch out from an authorized location.")
+      render turbo_stream: turbo_stream.replace("punch_out_modal", partial: "work_logs/punch_out_modal")
+      return
+    end
+
+    # Handle form submission
+    @work_log.update!(punch_out: Time.current, location_lat: params[:location_lat], location_lng: params[:location_lng], mood: params[:work_log][:mood])
+
+    # Update task completion status
+    if params[:work_log_task_ids].present?
+      params[:work_log_task_ids].each do |task_id|
+        work_log_task = @work_log.work_log_tasks.find(task_id)
+        work_log_task.update!(status: :completed, duration_minutes: params[:durations][task_id])
+        work_log_task.task.increment_usage
+      end
+    end
+
+    # Add additional tasks
+    if params[:additional_tasks].present?
+      params[:additional_tasks].each do |task_title|
+        next if task_title.blank?
+
+        new_task = current_user.tasks.create!(
+          title: task_title,
+          category: "Custom",
+          priority: :medium,
+          is_global: false
+        )
+
+        @work_log.work_log_tasks.create!(
+          task: new_task,
+          status: :completed,
+          duration_minutes: 30 # default duration
+        )
+
+        new_task.increment_usage
+      end
+    end
+
+    redirect_to root_path, notice: "Successfully punched out! Great work today!"
+  end
+
+  private
+
+  def within_work_zone?(lat, lng)
+    # Find all active work zones
+    active_zones = WorkZone.where(active: true)
+
+    # Check if the location is within any of the active zones
+    active_zones.any? { |zone| zone.contains?(lat, lng) }
+  end
+end

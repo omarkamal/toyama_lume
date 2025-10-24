@@ -1,0 +1,22 @@
+<% if @tasks.any? %>
+  <% @tasks.each do |task| %>
+    <label class="flex items-center p-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0">
+      <%= check_box_tag "work_log[task_ids][]", task.id, false,
+          class: "mr-3 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" %>
+      <div class="flex-1">
+        <div class="font-medium text-sm"><%= task.title %></div>
+        <div class="flex items-center space-x-2 mt-1">
+          <%= task_priority_badge(task.priority) %>
+          <span class="text-xs text-gray-500"><%= task.category %></span>
+          <% if task.is_global? %>
+            <span class="text-xs text-blue-500">Global</span>
+          <% end %>
+        </div>
+      </div>
+    </label>
+  <% end %>
+<% else %>
+  <div class="p-4 text-center text-gray-500 text-sm">
+    No tasks found matching your search.
+  </div>
+<% end %>

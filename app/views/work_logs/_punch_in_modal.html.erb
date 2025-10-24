@@ -1,0 +1,199 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-900">Start Your Day</h2>
+        <button onclick="document.getElementById('punch_in_modal').remove()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <%= form_with(model: @work_log, url: work_logs_path, method: :post, data: { turbo: false }) do |f| %>
+        <!-- Smart Task Suggestions -->
+        <div class="mb-6">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">What are you working on today?</h3>
+
+          <!-- Top Suggestions -->
+          <% if @suggested_tasks.any? %>
+            <div class="mb-4">
+              <p class="text-xs text-gray-500 mb-2">Quick suggestions:</p>
+              <div class="space-y-2">
+                <% @suggested_tasks.first(4).each do |task| %>
+                  <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                    <%= check_box_tag "work_log[task_ids][]", task.id, false,
+                        class: "mr-3 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" %>
+                    <div class="flex-1">
+                      <div class="font-medium text-sm"><%= task.title %></div>
+                      <div class="flex items-center space-x-2 mt-1">
+                        <%= task_priority_badge(task.priority) %>
+                        <span class="text-xs text-gray-500"><%= task.category %></span>
+                        <span class="text-xs text-gray-400">Used <%= task.usage_count %>x</span>
+                      </div>
+                    </div>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Task Search -->
+          <div class="mb-4">
+            <p class="text-xs text-gray-500 mb-2">Or search for a task:</p>
+            <div class="relative">
+              <input type="text"
+                     id="task_search"
+                     placeholder="Type to search tasks..."
+                     class="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+              <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <div id="task_search_results" class="mt-2 max-h-32 overflow-y-auto border rounded-lg hidden">
+              <!-- Search results will appear here -->
+            </div>
+          </div>
+
+          <!-- Custom Task -->
+          <div>
+            <p class="text-xs text-gray-500 mb-2">Or create a custom task:</p>
+            <input type="text"
+                   name="custom_task"
+                   placeholder="Enter custom task..."
+                   class="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+        </div>
+
+        <!-- Location Capture (Required) -->
+        <div class="mb-6">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">
+            Confirm Location <span class="text-red-500">*</span>
+          </h3>
+          <div class="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div class="flex items-center space-x-2">
+              <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span class="text-sm text-gray-600">Location required to punch in</span>
+            </div>
+            <div id="punch_in_location_status" class="text-xs text-gray-500">
+              <button type="button" onclick="capturePunchInLocation()" class="text-indigo-600 hover:text-indigo-800 font-medium">
+                Get Location
+              </button>
+            </div>
+          </div>
+          <%= hidden_field_tag :location_lat, nil, required: true %>
+          <%= hidden_field_tag :location_lng, nil, required: true %>
+          <div id="location_error" class="mt-2 text-xs text-red-600 hidden">
+            Location is required to punch in. Please enable location access.
+          </div>
+        </div>
+
+        <!-- Mood Selection -->
+        <div class="mb-6">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">How are you feeling? (optional)</h3>
+          <div class="flex justify-center space-x-4">
+            <label class="cursor-pointer">
+              <input type="radio" name="work_log[mood]" value="happy" class="sr-only peer">
+              <div class="text-4xl peer-checked:scale-110 transition-transform">😊</div>
+              <div class="text-xs text-center mt-1 text-gray-500">Great</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="work_log[mood]" value="neutral" class="sr-only peer" checked>
+              <div class="text-4xl peer-checked:scale-110 transition-transform">😐</div>
+              <div class="text-xs text-center mt-1 text-gray-500">Okay</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="work_log[mood]" value="sad" class="sr-only peer">
+              <div class="text-4xl peer-checked:scale-110 transition-transform">😞</div>
+              <div class="text-xs text-center mt-1 text-gray-500">Tired</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-3">
+          <button type="button"
+                  onclick="document.getElementById('punch_in_modal').remove()"
+                  class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition">
+            Punch In
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('task_search');
+  const searchResults = document.getElementById('task_search_results');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const query = this.value.trim();
+
+      if (query.length < 2) {
+        searchResults.classList.add('hidden');
+        return;
+      }
+
+      fetch(`/tasks/search?q=${encodeURIComponent(query)}`)
+        .then(response => response.text())
+        .then(html => {
+          searchResults.innerHTML = html;
+          searchResults.classList.remove('hidden');
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+          searchResults.classList.add('hidden');
+        });
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.classList.add('hidden');
+      }
+    });
+  }
+
+  // Auto-capture location on modal load
+  if (document.getElementById('punch_in_location_status')) {
+    capturePunchInLocation();
+  }
+});
+
+function capturePunchInLocation() {
+  const statusDiv = document.getElementById('punch_in_location_status');
+  const errorDiv = document.getElementById('location_error');
+
+  statusDiv.innerHTML = '<span class="text-yellow-600">Getting location...</span>';
+  errorDiv.classList.add('hidden');
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        document.getElementById('location_lat').value = position.coords.latitude;
+        document.getElementById('location_lng').value = position.coords.longitude;
+        statusDiv.innerHTML = '<span class="text-green-600">✓ Location captured</span>';
+      },
+      function(error) {
+        statusDiv.innerHTML = '<button type="button" onclick="capturePunchInLocation()" class="text-indigo-600 hover:text-indigo-800 font-medium">Retry</button>';
+        errorDiv.textContent = 'Location access denied. Please enable location to punch in.';
+        errorDiv.classList.remove('hidden');
+      }
+    );
+  } else {
+    statusDiv.innerHTML = '<span class="text-red-600">Geolocation not supported</span>';
+    errorDiv.textContent = 'Your browser does not support geolocation.';
+    errorDiv.classList.remove('hidden');
+  }
+}
+</script>

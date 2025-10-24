@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  punch_in: 2025-10-23 13:22:14
+  punch_out: 2025-10-23 13:22:14
+  location_lat: 9.99
+  location_lng: 9.99
+  mood: MyString
+
+two:
+  user: two
+  punch_in: 2025-10-23 13:22:14
+  punch_out: 2025-10-23 13:22:14
+  location_lat: 9.99
+  location_lng: 9.99
+  mood: MyString

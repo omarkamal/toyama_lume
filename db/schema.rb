@@ -1,0 +1,76 @@
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
+#
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
+#
+# It's strongly recommended that you check this file into your version control system.
+
+ActiveRecord::Schema[8.1].define(version: 2025_10_23_130058) do
+  create_table "tasks", force: :cascade do |t|
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.boolean "is_global", default: false
+    t.string "priority"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.integer "usage_count", default: 0
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_tasks_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name"
+    t.string "password_digest"
+    t.string "role"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "work_log_tasks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "duration_minutes"
+    t.text "notes"
+    t.string "status"
+    t.integer "task_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "work_log_id", null: false
+    t.index ["task_id"], name: "index_work_log_tasks_on_task_id"
+    t.index ["work_log_id"], name: "index_work_log_tasks_on_work_log_id"
+  end
+
+  create_table "work_logs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.decimal "location_lat"
+    t.decimal "location_lng"
+    t.string "mood"
+    t.datetime "punch_in"
+    t.datetime "punch_out"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_work_logs_on_user_id"
+  end
+
+  create_table "work_zones", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.decimal "latitude", precision: 10, scale: 6, null: false
+    t.decimal "longitude", precision: 10, scale: 6, null: false
+    t.string "name", null: false
+    t.integer "radius", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_work_zones_on_active"
+  end
+
+  add_foreign_key "tasks", "users"
+  add_foreign_key "work_log_tasks", "tasks"
+  add_foreign_key "work_log_tasks", "work_logs"
+  add_foreign_key "work_logs", "users"
+end

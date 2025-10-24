@@ -1,0 +1,116 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-900">Add Task to Session</h2>
+        <button onclick="document.getElementById('task_modal').remove()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <%= form_with(url: add_task_work_log_path(@work_log), method: :post, data: { turbo: false }) do |f| %>
+        <!-- Quick Suggestions -->
+        <% if @suggested_tasks.any? %>
+          <div class="mb-4">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3">Quick suggestions:</h3>
+            <div class="space-y-2">
+              <% @suggested_tasks.each do |task| %>
+                <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                  <%= radio_button_tag "task_id", task.id, false,
+                      class: "mr-3 h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" %>
+                  <div class="flex-1">
+                    <div class="font-medium text-sm"><%= task.title %></div>
+                    <div class="flex items-center space-x-2 mt-1">
+                      <%= task_priority_badge(task.priority) %>
+                      <span class="text-xs text-gray-500"><%= task.category %></span>
+                      <span class="text-xs text-gray-400">Used <%= task.usage_count %>x</span>
+                    </div>
+                  </div>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Task Search -->
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">Search for a task:</h3>
+          <div class="relative">
+            <input type="text"
+                   id="task_search_inline"
+                   placeholder="Type to search tasks..."
+                   class="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <div id="task_search_results_inline" class="mt-2 max-h-32 overflow-y-auto border rounded-lg hidden">
+            <!-- Search results will appear here -->
+          </div>
+        </div>
+
+        <!-- Custom Task -->
+        <div class="mb-6">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">Or create a custom task:</h3>
+          <input type="text"
+                 name="custom_task"
+                 placeholder="Enter task description..."
+                 class="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-3">
+          <button type="button"
+                  onclick="document.getElementById('task_modal').remove()"
+                  class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition">
+            Add Task
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('task_search_inline');
+  const searchResults = document.getElementById('task_search_results_inline');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const query = this.value.trim();
+
+      if (query.length < 2) {
+        searchResults.classList.add('hidden');
+        return;
+      }
+
+      fetch(`/tasks/search?q=${encodeURIComponent(query)}`)
+        .then(response => response.text())
+        .then(html => {
+          searchResults.innerHTML = html.replace(/work_log\[task_ids\]\[\]/g, 'task_id')
+                                       .replace(/checkbox/g, 'radio')
+                                       .replace(/checkbox/g, 'radio');
+          searchResults.classList.remove('hidden');
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+          searchResults.classList.add('hidden');
+        });
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.classList.add('hidden');
+      }
+    });
+  }
+});
+</script>
