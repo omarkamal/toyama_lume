@@ -3,7 +3,7 @@ class TasksController < ApplicationController
   before_action :set_task, only: [:show, :edit, :update, :destroy, :complete]
 
   def index
-    @tasks = current_user.tasks.order(created_at: :desc).page(params[:page])
+    @pagy, @tasks = pagy(current_user.tasks.order(created_at: :desc))
   end
 
   def new
@@ -56,7 +56,7 @@ class TasksController < ApplicationController
   end
 
   def my_tasks
-    @my_tasks = current_user.tasks.personal.order(created_at: :desc).page(params[:page])
+    @pagy, @my_tasks = pagy(current_user.tasks.personal.order(created_at: :desc))
   end
 
   def complete
