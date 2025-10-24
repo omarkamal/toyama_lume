@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
   before_action :require_login
-  before_action :set_task, only: [:show, :edit, :update, :destroy, :complete]
+  before_action :set_task, only: [ :show, :edit, :update, :destroy, :complete ]
 
   def index
     @pagy, @tasks = pagy(current_user.tasks.order(created_at: :desc))
@@ -42,7 +42,7 @@ class TasksController < ApplicationController
   def suggestions
     @suggested_tasks = Task.suggested_for(current_user)
     respond_to do |format|
-      format.json { render json: @suggested_tasks.as_json(only: [:id, :title, :category, :priority]) }
+      format.json { render json: @suggested_tasks.as_json(only: [ :id, :title, :category, :priority ]) }
     end
   end
 
