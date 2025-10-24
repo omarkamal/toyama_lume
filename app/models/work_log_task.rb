@@ -9,6 +9,8 @@ class WorkLogTask < ApplicationRecord
   validates :status, presence: true
   validates :duration_minutes, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
+  scope :pending, -> { where(carry_forward: true, status: [ :planned, :in_progress ]) }
+
   def completed?
     status == "completed"
   end

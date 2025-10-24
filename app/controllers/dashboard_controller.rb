@@ -15,5 +15,8 @@ class DashboardController < ApplicationController
     else
       @active_tasks = []
     end
+
+    # Get pending tasks count
+    @pending_tasks_count = current_user.pending_tasks.count
   end
 end

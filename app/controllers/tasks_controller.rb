@@ -56,6 +56,7 @@ class TasksController < ApplicationController
   end
 
   def my_tasks
+    @pending_tasks = current_user.pending_tasks.map(&:task).uniq
     @pagy, @my_tasks = pagy(current_user.tasks.personal.order(created_at: :desc))
   end
 
