@@ -17,4 +17,14 @@ class User < ApplicationRecord
   def remote_worker?
     remote
   end
+
+  # Get pending tasks from previous sessions that were marked to carry forward
+  def pending_tasks
+    work_log_tasks.pending.includes(:task, work_log: :user).order("work_logs.punch_in DESC")
+  end
+
+  # Get unique pending task IDs for punch-in suggestions
+  def pending_task_ids
+    pending_tasks.pluck(:task_id).uniq
+  end
 end

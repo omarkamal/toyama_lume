@@ -42,7 +42,7 @@
                     <div class="flex items-center space-x-2">
                       <%= check_box_tag "work_log_task_ids[]", work_log_task.id, work_log_task.completed?,
                           class: "h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500",
-                          onchange: "toggleTaskDuration(#{work_log_task.id})" %>
+                          onchange: "toggleTaskActions(#{work_log_task.id})" %>
                       <span class="text-xs text-gray-600">Complete</span>
                     </div>
                   </div>
@@ -56,6 +56,15 @@
                            min="0"
                            step="15"
                            class="w-full mt-1 px-3 py-1 border rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                  </div>
+
+                  <!-- Carry Forward Option (shown when task is NOT marked complete) -->
+                  <div id="carry_forward_<%= work_log_task.id %>" class="<%= 'hidden' if work_log_task.completed? %> mt-2 pt-2 border-t border-gray-200">
+                    <label class="flex items-center cursor-pointer">
+                      <%= check_box_tag "carry_forward_task_ids[]", work_log_task.id, false,
+                          class: "h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" %>
+                      <span class="ml-2 text-xs text-gray-600">Add to pending tasks for later</span>
+                    </label>
                   </div>
                 </div>
               <% end %>
@@ -172,14 +181,21 @@ function closePunchOutModal() {
   }
 }
 
-function toggleTaskDuration(taskId) {
+function toggleTaskActions(taskId) {
   const durationDiv = document.getElementById('duration_' + taskId);
-  const checkbox = document.querySelector(`input[value="${taskId}"]`);
+  const carryForwardDiv = document.getElementById('carry_forward_' + taskId);
+  const checkbox = document.querySelector(`input[value="${taskId}"][name="work_log_task_ids[]"]`);
+  const carryForwardCheckbox = document.querySelector(`input[value="${taskId}"][name="carry_forward_task_ids[]"]`);
 
   if (checkbox.checked) {
+    // Task completed - show duration, hide carry forward
     durationDiv.classList.remove('hidden');
+    carryForwardDiv.classList.add('hidden');
+    if (carryForwardCheckbox) carryForwardCheckbox.checked = false;
   } else {
+    // Task not completed - hide duration, show carry forward
     durationDiv.classList.add('hidden');
+    carryForwardDiv.classList.remove('hidden');
   }
 }
 

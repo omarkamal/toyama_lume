@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_24_070416) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_24_092557) do
   create_table "tasks", force: :cascade do |t|
     t.string "category"
     t.datetime "created_at", null: false
@@ -35,6 +35,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_24_070416) do
   end
 
   create_table "work_log_tasks", force: :cascade do |t|
+    t.boolean "carry_forward", default: false
     t.datetime "created_at", null: false
     t.integer "duration_minutes"
     t.text "notes"

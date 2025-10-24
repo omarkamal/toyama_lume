@@ -80,6 +80,28 @@
         <div class="text-xs text-[#97D700] mt-1">Right now</div>
       </div>
     </div>
+
+    <!-- Pending Tasks Indicator -->
+    <% if @pending_tasks_count > 0 && !@current_work_log %>
+      <div class="mt-4 bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <div>
+              <div class="text-sm font-medium text-indigo-900">
+                <%= @pending_tasks_count %> task<%= 's' if @pending_tasks_count != 1 %> waiting
+              </div>
+              <div class="text-xs text-indigo-700">Ready to work on when you punch in</div>
+            </div>
+          </div>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-600 text-white">
+            <%= @pending_tasks_count %>
+          </span>
+        </div>
+      </div>
+    <% end %>
   </div>
 
   <!-- Today's Tasks Section -->

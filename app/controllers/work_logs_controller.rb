@@ -48,6 +48,9 @@ class WorkLogsController < ApplicationController
             next if task_id.blank?
             task = Task.find(task_id)
             @work_log.work_log_tasks.create!(task: task, status: :planned)
+
+            # Clear carry_forward flag from previous pending tasks when re-added
+            current_user.work_log_tasks.pending.where(task_id: task_id).update_all(carry_forward: false)
           end
         end
 
@@ -70,6 +73,9 @@ class WorkLogsController < ApplicationController
       # Show modal
       @work_log = current_user.work_logs.new
       @suggested_tasks = Task.suggested_for(current_user, limit: 4)
+
+      # Get pending tasks from previous sessions
+      @pending_tasks = current_user.pending_tasks.map(&:task).uniq
 
       # Fallback: if no suggestions, get some popular global tasks
       if @suggested_tasks.empty?
@@ -155,6 +161,14 @@ class WorkLogsController < ApplicationController
         work_log_task = @work_log.work_log_tasks.find(task_id)
         work_log_task.update!(status: :completed, duration_minutes: params[:durations][task_id])
         work_log_task.task.increment_usage
+      end
+    end
+
+    # Mark tasks for carry forward (uncompleted tasks to add to pending)
+    if params[:carry_forward_task_ids].present?
+      params[:carry_forward_task_ids].each do |task_id|
+        work_log_task = @work_log.work_log_tasks.find(task_id)
+        work_log_task.update!(carry_forward: true)
       end
     end
 
