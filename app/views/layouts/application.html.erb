@@ -21,30 +21,59 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    
+    <%# Google Fonts - DM Sans and Poppins %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'navy': '#10223A',
+              'teal': '#226A73',
+              'lime': '#97D700',
+              'carbon-light': '#F8F7F7',
+              'carbon-heavy': '#323233',
+              'cloudy': '#DBDBDB',
+            },
+            fontFamily: {
+              'heading': ['DM Sans', 'sans-serif'],
+              'body': ['Poppins', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
   </head>
 
-  <body class="bg-[#F8F7F7]">
+  <body class="bg-carbon-light font-body">
     <% if logged_in? %>
-      <nav class="bg-white shadow-sm border-b border-gray-200">
+      <nav class="bg-white shadow-sm border-b border-cloudy">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between h-16">
-            <div class="flex">
+            <div class="flex items-center">
               <div class="flex-shrink-0 flex items-center">
-                <%= link_to "Lume", root_path, class: "text-xl font-semibold text-gray-900" %>
+                <%= link_to root_path, class: "flex items-center gap-3" do %>
+                  <%= image_tag "toyama_logo.svg", alt: "Toyama", class: "h-8" %>
+                  <span class="text-sm font-heading font-medium text-carbon-heavy/60">Lume</span>
+                <% end %>
               </div>
-              <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <%= link_to "Dashboard", root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path == root_path ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} text-sm font-medium" %>
-                <%= link_to "My Tasks", my_tasks_tasks_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path == my_tasks_tasks_path ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} text-sm font-medium" %>
-                <%= link_to "Work Logs", work_logs_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path == work_logs_path ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} text-sm font-medium" %>
+              <div class="hidden sm:ml-8 sm:flex sm:space-x-8">
+                <%= link_to "Dashboard", root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path == root_path ? 'border-teal text-navy' : 'border-transparent text-carbon-heavy/60 hover:text-navy hover:border-cloudy'} text-sm font-body font-normal transition-colors" %>
+                <%= link_to "My Tasks", my_tasks_tasks_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path == my_tasks_tasks_path ? 'border-teal text-navy' : 'border-transparent text-carbon-heavy/60 hover:text-navy hover:border-cloudy'} text-sm font-body font-normal transition-colors" %>
+                <%= link_to "Work Logs", work_logs_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path == work_logs_path ? 'border-teal text-navy' : 'border-transparent text-carbon-heavy/60 hover:text-navy hover:border-cloudy'} text-sm font-body font-normal transition-colors" %>
                 <% if current_user.admin? %>
-                  <%= link_to "Admin", admin_root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path.start_with?(admin_root_path) ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} text-sm font-medium" %>
+                  <%= link_to "Admin", admin_root_path, class: "inline-flex items-center px-1 pt-1 border-b-2 #{request.path.start_with?(admin_root_path) ? 'border-teal text-navy' : 'border-transparent text-carbon-heavy/60 hover:text-navy hover:border-cloudy'} text-sm font-body font-normal transition-colors" %>
                 <% end %>
               </div>
             </div>
             <div class="flex items-center">
-              <span class="text-sm text-gray-700 mr-4">Hi, <%= current_user.name %>!</span>
-              <%= button_to "Logout", logout_path, method: :delete, class: "bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium" %>
+              <span class="text-sm font-body font-light text-carbon-heavy/70 mr-4">Hi, <%= current_user.name %>!</span>
+              <%= button_to "Logout", logout_path, method: :delete, class: "bg-navy hover:bg-navy/90 text-white px-4 py-2 rounded-lg text-sm font-body font-normal transition-all" %>
             </div>
           </div>
         </div>
@@ -55,9 +84,9 @@
       <% if flash.any? %>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 space-y-2 pt-6">
           <% flash.each do |type, message| %>
-            <div class="<%= flash_class(type) %> rounded-md p-4 flex items-center justify-between">
+            <div class="<%= flash_class(type) %> rounded-lg p-4 flex items-center justify-between font-body font-light">
               <div><%= message %></div>
-              <button onclick="this.parentElement.remove()" class="ml-4 text-gray-500 hover:text-gray-700">&times;</button>
+              <button onclick="this.parentElement.remove()" class="ml-4 text-carbon-heavy/60 hover:text-carbon-heavy transition-colors text-xl leading-none">&times;</button>
             </div>
           <% end %>
         </div>

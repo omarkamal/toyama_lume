@@ -39,6 +39,14 @@
 - [x] ~~Real-time session management~~ with active task tracking - **✅ COMPLETE with inline task controls**
 - [x] ~~Geofencing integration~~ with location validation - **✅ COMPLETE with zone-based validation**
 
+## Pending Tasks System ✅ COMPLETED (NEW!)
+- [x] ~~Add carry_forward field to work_log_tasks~~ - **✅ COMPLETE with boolean flag**
+- [x] ~~Update punch-out modal~~ with option to mark incomplete tasks for later - **✅ COMPLETE with carry forward checkboxes**
+- [x] ~~Update punch-in modal~~ to show pending tasks at top - **✅ COMPLETE with dedicated pending section**
+- [x] ~~Create pending tasks query methods~~ - **✅ COMPLETE with User#pending_tasks and WorkLogTask.pending scope**
+- [x] ~~Update "My Tasks" page~~ to show pending tasks prominently - **✅ COMPLETE with highlighted pending section**
+- [x] ~~Add dashboard indicator~~ for pending task count - **✅ COMPLETE**
+
 ## Additional Features 🔄 IN PROGRESS
 - [ ] Create `LeaveRequest` model + basic approval flow (boolean + timestamps)
 - [ ] Add static holiday list (YAML → seed data)
@@ -72,6 +80,7 @@
 - ✅ Real-time task status tracking during work sessions
 - ✅ **Modal-based task selection with live search**
 - ✅ **Task progression controls (planned → in_progress → completed)**
+- ✅ **Pending tasks system (carry forward incomplete work to future sessions)**
 - ✅ Global vs personal task templates
 - ✅ **Enhanced UX with proper error handling and validation**
 
@@ -81,6 +90,7 @@
 3. **Enhanced task workflow** - Modal-based task selection with smart suggestions and live search
 4. **Location-first validation** - Mandatory location capture for both punch-in and punch-out
 5. **Real-time task management** - Inline controls for task status updates during active sessions
+6. **Pending tasks system** - Mark incomplete tasks to carry forward to future work sessions
 
 **Next Priority Features:**
 1. **Leave request system** for time-off management
