@@ -24,7 +24,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
-  <body class="bg-gray-50">
+  <body class="bg-[#F8F7F7]">
     <% if logged_in? %>
       <nav class="bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,9 +51,9 @@
       </nav>
     <% end %>
 
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <main>
       <% if flash.any? %>
-        <div class="mb-4 space-y-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 space-y-2 pt-6">
           <% flash.each do |type, message| %>
             <div class="<%= flash_class(type) %> rounded-md p-4 flex items-center justify-between">
               <div><%= message %></div>
