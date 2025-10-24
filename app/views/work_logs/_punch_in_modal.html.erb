@@ -3,14 +3,14 @@
     <div class="p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-gray-900">Start Your Day</h2>
-        <button type="button" onclick="closePunchInModal()" class="text-gray-400 hover:text-gray-600" data-turbo="false">
+        <button type="button" onclick="closePunchInModal()" class="text-gray-400 hover:text-gray-600">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       </div>
 
-      <%= form_with(url: punch_in_work_logs_path, method: :post, data: { turbo: false }) do |f| %>
+      <%= form_with(url: punch_in_work_logs_path, method: :post) do |f| %>
         <!-- Smart Task Suggestions -->
         <div class="mb-6">
           <h3 class="text-sm font-semibold text-gray-700 mb-3">What are you working on today?</h3>
@@ -121,7 +121,6 @@
         <div class="flex space-x-3">
           <button type="button"
                   onclick="closePunchInModal()"
-                  data-turbo="false"
                   class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
             Cancel
           </button>
@@ -209,23 +208,51 @@ function capturePunchInLocation() {
   statusDiv.innerHTML = '<span class="text-yellow-600">Getting location...</span>';
   errorDiv.classList.add('hidden');
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      function(position) {
-        document.getElementById('location_lat').value = position.coords.latitude;
-        document.getElementById('location_lng').value = position.coords.longitude;
-        statusDiv.innerHTML = '<span class="text-green-600">✓ Location captured</span>';
-      },
-      function(error) {
-        statusDiv.innerHTML = '<button type="button" onclick="capturePunchInLocation()" class="text-indigo-600 hover:text-indigo-800 font-medium">Retry</button>';
-        errorDiv.textContent = 'Location access denied. Please enable location to punch in.';
-        errorDiv.classList.remove('hidden');
-      }
-    );
-  } else {
-    statusDiv.innerHTML = '<span class="text-red-600">Geolocation not supported</span>';
+  if (!navigator.geolocation) {
+    statusDiv.innerHTML = '<span class="text-red-600">Not supported</span>';
     errorDiv.textContent = 'Your browser does not support geolocation.';
     errorDiv.classList.remove('hidden');
+    return;
   }
+
+  // Options for geolocation
+  const options = {
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 0
+  };
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      document.getElementById('location_lat').value = position.coords.latitude;
+      document.getElementById('location_lng').value = position.coords.longitude;
+      statusDiv.innerHTML = '<span class="text-green-600">✓ Location captured</span>';
+      errorDiv.classList.add('hidden');
+    },
+    function(error) {
+      let errorMessage = '';
+      
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          errorMessage = 'Location permission denied. Please enable location access in your browser settings and try again.';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMessage = 'Location information is unavailable. Please ensure location services are enabled on your device.';
+          break;
+        case error.TIMEOUT:
+          errorMessage = 'Location request timed out. Please try again.';
+          break;
+        default:
+          errorMessage = 'An unknown error occurred while getting your location.';
+      }
+      
+      statusDiv.innerHTML = '<button type="button" onclick="capturePunchInLocation()" class="text-indigo-600 hover:text-indigo-800 font-medium">Retry</button>';
+      errorDiv.textContent = errorMessage;
+      errorDiv.classList.remove('hidden');
+      
+      console.error('Geolocation error:', error.code, error.message);
+    },
+    options
+  );
 }
 </script>
