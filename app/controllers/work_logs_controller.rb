@@ -22,7 +22,7 @@ class WorkLogsController < ApplicationController
       # Handle form submission
       @work_log = current_user.work_logs.new(
         punch_in: Time.current,
-        mood: params[:work_log][:mood],
+        mood: params.dig(:work_log, :mood) || :neutral,
         location_lat: params[:location_lat],
         location_lng: params[:location_lng]
       )
@@ -69,6 +69,15 @@ class WorkLogsController < ApplicationController
     else
       # Show modal
       @work_log = current_user.work_logs.new
+      @suggested_tasks = Task.suggested_for(current_user, limit: 4)
+
+      # Fallback: if no suggestions, get some popular global tasks
+      if @suggested_tasks.empty?
+        @suggested_tasks = Task.global.popular.limit(4)
+      end
+
+      Rails.logger.info "Debug: Current user: #{current_user&.email}"
+      Rails.logger.info "Debug: Suggested tasks count: #{@suggested_tasks&.count}"
       render turbo_stream: turbo_stream.update("punch_in_modal", partial: "work_logs/punch_in_modal")
     end
   end
@@ -138,7 +147,7 @@ class WorkLogsController < ApplicationController
     end
 
     # Handle form submission
-    @work_log.update!(punch_out: Time.current, location_lat: params[:location_lat], location_lng: params[:location_lng], mood: params[:work_log][:mood])
+    @work_log.update!(punch_out: Time.current, location_lat: params[:location_lat], location_lng: params[:location_lng], mood: params.dig(:work_log, :mood) || :neutral)
 
     # Update task completion status
     if params[:work_log_task_ids].present?
