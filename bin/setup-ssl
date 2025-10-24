@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -e
+
+echo "Setting up SSL certificates for local development..."
+
+# Create ssl directory if it doesn't exist
+mkdir -p config/ssl
+
+# Generate self-signed certificate
+openssl req -x509 -sha256 -nodes -newkey rsa:2048 \
+  -days 365 \
+  -keyout config/ssl/localhost.key \
+  -out config/ssl/localhost.crt \
+  -subj "/C=US/ST=State/L=City/O=Development/CN=localhost" \
+  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1,IP:192.168.1.1,IP:192.168.0.1,IP:10.0.0.1"
+
+echo "✓ SSL certificates generated in config/ssl/"
+echo ""
+echo "To use HTTPS, run: bin/rails server -b 'ssl://0.0.0.0:3000?key=config/ssl/localhost.key&cert=config/ssl/localhost.crt'"
+echo ""
+echo "Or add this to your .env file:"
+echo "PUMA_BIND=ssl://0.0.0.0:3000?key=config/ssl/localhost.key&cert=config/ssl/localhost.crt"
