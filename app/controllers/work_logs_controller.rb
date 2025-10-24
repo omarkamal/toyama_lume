@@ -82,8 +82,12 @@ class WorkLogsController < ApplicationController
         @suggested_tasks = Task.global.popular.limit(4)
       end
 
+      # Check if we should request mood (random weekly check)
+      @should_request_mood = should_request_mood?(current_user)
+
       Rails.logger.info "Debug: Current user: #{current_user&.email}"
       Rails.logger.info "Debug: Suggested tasks count: #{@suggested_tasks&.count}"
+      Rails.logger.info "Debug: Should request mood: #{@should_request_mood}"
       render turbo_stream: turbo_stream.update("punch_in_modal", partial: "work_logs/punch_in_modal")
     end
   end
@@ -97,6 +101,9 @@ class WorkLogsController < ApplicationController
     end
 
     # Always show modal first (GET request)
+    # Check if we should request mood (random weekly check)
+    @should_request_mood = should_request_mood?(current_user)
+    Rails.logger.info "Debug: Punch out - Should request mood: #{@should_request_mood}"
     render turbo_stream: turbo_stream.update("punch_out_modal", partial: "work_logs/punch_out_modal")
   end
 

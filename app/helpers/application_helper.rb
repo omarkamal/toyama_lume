@@ -36,6 +36,26 @@ module ApplicationHelper
     end
   end
 
+  # Random weekly mood tracking - Option A: True Random
+  # ~14% chance (1 in 7) on any given punch action
+  def should_request_mood?(user)
+    return false unless user
+
+    # Check if mood was already requested in the current session
+    # to avoid asking multiple times in the same work session
+    session_key = "mood_requested_#{user.id}_#{Date.current}"
+    return false if session[session_key]
+
+    # True random: 1 in 7 chance (~14% probability)
+    # This roughly averages to once per week but is completely unpredictable
+    should_request = rand(7) == 0
+
+    # Mark that we've checked for this user today
+    session[session_key] = true if should_request
+
+    should_request
+  end
+
   def task_status_badge(status)
     classes = case status
     when "planned" then "bg-cloudy text-carbon-heavy"
