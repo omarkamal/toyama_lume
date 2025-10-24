@@ -1,0 +1,40 @@
+<% content_for :title, "Manage Users" %>
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold text-[#10223A]">Users</h1>
+    <%= link_to "← Back to Dashboard", admin_root_path, class: "text-[#226A73] text-sm hover:underline" %>
+  </div>
+
+  <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden">
+    <div class="divide-y divide-[#DBDBDB]">
+      <% @users.each do |user| %>
+        <div class="p-4 hover:bg-[#F8F7F7] transition-colors">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="font-medium text-[#10223A]"><%= user.name %></div>
+              <div class="text-sm text-[#323233]/60 mt-0.5"><%= user.email %></div>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium
+                  <%= user.admin? ? 'bg-[#226A73]/10 text-[#226A73]' : 'bg-[#DBDBDB] text-[#323233]' %>">
+                  <%= user.role.titleize %>
+                </span>
+                <% if user.remote %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-[#97D700]/10 text-[#97D700]">
+                    Remote Worker
+                  </span>
+                <% end %>
+                <span class="text-xs text-[#323233]/60">
+                  <%= pluralize(user.work_zones.count, 'work zone') %>
+                </span>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <%= link_to "View Details", admin_user_path(user), class: "bg-[#10223A] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#10223A]/90 transition-colors" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

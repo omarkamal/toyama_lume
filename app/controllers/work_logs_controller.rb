@@ -186,10 +186,16 @@ class WorkLogsController < ApplicationController
   private
 
   def within_work_zone?(lat, lng)
-    # Find all active work zones
-    active_zones = WorkZone.where(active: true)
+    # Remote workers can punch in from anywhere
+    return true if current_user.remote_worker?
 
-    # Check if the location is within any of the active zones
-    active_zones.any? { |zone| zone.contains?(lat, lng) }
+    # Get user-specific work zones and global work zones
+    user_zones = WorkZone.for_user(current_user)
+    global_zones = WorkZone.global
+
+    all_zones = user_zones + global_zones
+
+    # Check if the location is within any of the zones
+    all_zones.any? { |zone| zone.contains?(lat, lng) }
   end
 end

@@ -1,0 +1,65 @@
+<% content_for :title, "Admin Dashboard" %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h1 class="text-3xl font-bold text-[#10223A] mb-8">Admin Dashboard</h1>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-xl border border-[#DBDBDB] p-6 shadow-sm">
+      <div class="text-3xl font-medium text-[#10223A] mb-2"><%= @total_users %></div>
+      <div class="text-sm text-[#323233]/60">Total Users</div>
+      <%= link_to "View all →", admin_users_path, class: "text-[#226A73] text-sm mt-2 inline-block hover:underline" %>
+    </div>
+
+    <div class="bg-white rounded-xl border border-[#DBDBDB] p-6 shadow-sm">
+      <div class="text-3xl font-medium text-[#226A73] mb-2"><%= @remote_users %></div>
+      <div class="text-sm text-[#323233]/60">Remote Workers</div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-[#DBDBDB] p-6 shadow-sm">
+      <div class="text-3xl font-medium text-[#97D700] mb-2"><%= @total_work_zones %></div>
+      <div class="text-sm text-[#323233]/60">Work Zones</div>
+      <p class="text-xs text-[#323233]/60 mt-2">Configured across all users</p>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-white rounded-xl border border-[#DBDBDB] p-6 shadow-sm mb-8">
+    <h2 class="text-lg font-medium text-[#10223A] mb-4">Quick Actions</h2>
+    <div class="flex flex-wrap gap-3">
+      <%= link_to "Manage Users", admin_users_path, class: "bg-[#10223A] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#10223A]/90 transition-colors" %>
+      <%= link_to "Task Templates", admin_tasks_path, class: "bg-[#97D700] text-[#10223A] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#97D700]/90 transition-colors" %>
+    </div>
+  </div>
+
+  <!-- Recent Users -->
+  <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-[#DBDBDB]">
+      <h2 class="text-lg font-medium text-[#10223A]">Recent Users</h2>
+    </div>
+    <div class="divide-y divide-[#DBDBDB]">
+      <% @recent_users.each do |user| %>
+        <div class="p-4 hover:bg-[#F8F7F7] transition-colors">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="font-medium text-[#10223A]"><%= user.name %></div>
+              <div class="text-sm text-[#323233]/60"><%= user.email %></div>
+            </div>
+            <div class="flex items-center gap-3">
+              <% if user.remote %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-[#97D700]/10 text-[#97D700]">
+                  Remote
+                </span>
+              <% end %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium
+                <%= user.admin? ? 'bg-[#226A73]/10 text-[#226A73]' : 'bg-[#DBDBDB] text-[#323233]' %>">
+                <%= user.role.titleize %>
+              </span>
+              <%= link_to "View", admin_user_path(user), class: "text-[#226A73] text-sm hover:underline" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

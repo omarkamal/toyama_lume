@@ -49,8 +49,11 @@ Rails.application.routes.draw do
   # Admin panel
   namespace :admin do
     root "dashboard#index"
-    resources :users
-    resources :tasks, only: [:index, :show, :destroy] do
+    resources :users do
+      resources :work_zones, only: [ :new, :create ]
+    end
+    resources :work_zones, only: [ :edit, :update, :destroy ]
+    resources :tasks, only: [ :index, :show, :destroy ] do
       member do
         post :toggle_global
       end

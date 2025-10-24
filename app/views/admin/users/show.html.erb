@@ -1,0 +1,75 @@
+<% content_for :title, "User: #{@user.name}" %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <%= link_to "← Back to Users", admin_users_path, class: "text-[#226A73] text-sm hover:underline mb-4 inline-block" %>
+  
+  <div class="bg-white rounded-xl border border-[#DBDBDB] p-6 shadow-sm mb-6">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <h1 class="text-2xl font-bold text-[#10223A]"><%= @user.name %></h1>
+        <p class="text-[#323233]/60 mt-1"><%= @user.email %></p>
+      </div>
+      <%= link_to "Edit User", edit_admin_user_path(@user), class: "bg-[#10223A] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#10223A]/90 transition-colors" %>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium
+        <%= @user.admin? ? 'bg-[#226A73]/10 text-[#226A73]' : 'bg-[#DBDBDB] text-[#323233]' %>">
+        <%= @user.role.titleize %>
+      </span>
+      <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium
+        <%= @user.remote? ? 'bg-[#97D700]/10 text-[#97D700]' : 'bg-[#DBDBDB] text-[#323233]' %>">
+        <%= @user.remote? ? 'Remote Worker' : 'Office-Based' %>
+      </span>
+    </div>
+  </div>
+
+  <!-- Work Zones Section -->
+  <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-[#DBDBDB] flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-medium text-[#10223A]">Work Zones</h2>
+        <p class="text-sm text-[#323233]/60 mt-1">
+          <%= @user.remote? ? "Remote worker can punch in from anywhere" : "User can punch in within these locations (200m radius)" %>
+        </p>
+      </div>
+      <%= link_to "+ Add Work Zone", new_admin_user_work_zone_path(@user), class: "bg-[#97D700] text-[#10223A] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#97D700]/90 transition-colors" %>
+    </div>
+
+    <% if @work_zones.any? %>
+      <div class="divide-y divide-[#DBDBDB]">
+        <% @work_zones.each do |zone| %>
+          <div class="p-4 hover:bg-[#F8F7F7] transition-colors">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="font-medium text-[#10223A] mb-1"><%= zone.name %></div>
+                <div class="text-sm text-[#323233]/60">
+                  <div>Lat: <%= zone.latitude %>, Lng: <%= zone.longitude %></div>
+                  <div class="mt-1">Radius: <%= zone.radius %>m</div>
+                </div>
+                <% unless zone.active %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-100 text-red-800 mt-2">
+                    Inactive
+                  </span>
+                <% end %>
+              </div>
+              <div class="flex items-center gap-2">
+                <%= link_to "Edit", edit_admin_work_zone_path(zone), class: "text-[#226A73] text-sm hover:underline" %>
+                <%= button_to "Delete", admin_work_zone_path(zone), method: :delete, 
+                    data: { confirm: "Are you sure you want to delete this work zone?" },
+                    class: "text-red-600 text-sm hover:underline" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-8 text-center text-[#323233]/60">
+        <p>No work zones configured for this user.</p>
+        <p class="text-sm mt-2">
+          <%= @user.remote? ? "As a remote worker, they can punch in from anywhere." : "Add a work zone to allow this user to punch in." %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>
