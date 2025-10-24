@@ -1,94 +1,242 @@
 <% content_for :title, "Dashboard" %>
 
-<div class="max-w-2xl mx-auto bg-white min-h-screen pb-20 sm:shadow-lg sm:my-4">
-  <!-- Header Section -->
-  <div class="bg-navy text-white px-4 sm:px-6 pt-6 pb-8 sm:rounded-t-xl">
-    <!-- Top Bar -->
-    <div class="flex items-start justify-between mb-6">
-      <div class="flex-1">
+<div class="min-h-screen bg-carbon-light pb-20">
+  <!-- Compact Header -->
+  <div class="bg-white border-b border-cloudy px-4 py-4 sm:px-6">
+    <div class="flex items-center justify-between">
+      <div>
         <p class="text-lime text-xs uppercase tracking-wide mb-1 font-body font-light">Welcome back</p>
-        <h1 class="text-xl sm:text-2xl font-heading font-medium"><%= current_user.name %></h1>
-        <p class="text-white/60 text-sm mt-1 font-body font-light">
+        <h1 class="text-xl font-heading font-medium text-navy"><%= current_user.name %></h1>
+        <p class="text-carbon-heavy/60 text-sm font-body font-light">
           <%= Date.current.strftime("%A, %B %d") %>
         </p>
       </div>
-      <div class="flex flex-col items-end gap-2">
+      <div class="flex items-center gap-3">
         <% if @current_work_log %>
-          <div class="bg-lime/20 border border-lime/30 px-3 py-1.5 rounded-lg">
-            <div class="flex items-center gap-1.5">
+          <div class="text-right">
+            <div class="bg-lime/20 border border-lime/30 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5">
               <div class="w-2 h-2 bg-lime rounded-full animate-pulse"></div>
               <span class="text-lime text-xs font-body font-normal">Active</span>
             </div>
+            <div class="text-xs text-carbon-heavy/60 mt-1">Since <%= @current_work_log.punch_in.strftime("%I:%M %p") %></div>
           </div>
-          <span class="text-white/50 text-xs font-body font-light">Since <%= @current_work_log.punch_in.strftime("%I:%M %p") %></span>
         <% else %>
-          <div class="bg-white/10 px-3 py-1.5 rounded-lg">
-            <span class="text-white/60 text-xs font-body font-normal">Offline</span>
+          <div class="bg-cloudy px-3 py-1.5 rounded-lg">
+            <span class="text-carbon-heavy/60 text-xs font-body font-normal">Offline</span>
           </div>
         <% end %>
       </div>
-    </div>
-
-    <!-- Main Action Button -->
-    <div class="mt-6">
-      <% if @current_work_log %>
-        <%= button_to punch_out_work_log_path(@current_work_log),
-            method: :get,
-            class: "w-full bg-white text-navy px-6 py-4 rounded-xl text-base font-body font-normal shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
-            form: { data: { turbo_frame: "punch_out_modal" } } do %>
-          <div class="flex items-center justify-center gap-3">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            <span>Punch Out</span>
-          </div>
-        <% end %>
-      <% else %>
-        <%= button_to punch_in_work_logs_path,
-            method: :post,
-            class: "w-full bg-lime text-navy px-6 py-4 rounded-xl text-base font-body font-normal shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
-            form: { data: { turbo_frame: "punch_in_modal" } } do %>
-          <div class="flex items-center justify-center gap-3">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-            </svg>
-            <span>Punch In</span>
-          </div>
-        <% end %>
-      <% end %>
     </div>
   </div>
 
-  <!-- Stats Grid -->
-  <div class="px-4 sm:px-6 -mt-6">
-    <div class="grid grid-cols-3 gap-3 sm:gap-4">
-      <div class="bg-white rounded-xl p-4 border border-cloudy shadow-sm">
-        <div class="text-2xl sm:text-3xl font-heading font-medium text-navy mb-1"><%= @week_work_logs.count %></div>
-        <div class="text-xs font-body font-light text-carbon-heavy/60">Days worked</div>
-        <div class="text-xs font-body font-normal text-teal mt-1">This week</div>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-cloudy shadow-sm">
-        <div class="text-2xl sm:text-3xl font-heading font-medium text-teal mb-1">
-          <%= @today_work_logs.sum { |wl| wl.duration_hours.round(1) } %><span class="text-lg">h</span>
+  <!-- Quick Actions Grid -->
+  <div class="px-4 py-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+      <!-- My Tasks Card -->
+      <%= link_to my_tasks_tasks_path, class: "bg-white p-4 rounded-xl border border-cloudy shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group" do %>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-teal/10 rounded-lg flex items-center justify-center group-hover:bg-teal/20 transition-colors">
+            <svg class="w-5 h-5 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <span class="text-2xl font-heading font-medium text-navy"><%= @pending_tasks_count + @active_tasks.count %></span>
         </div>
-        <div class="text-xs font-body font-light text-carbon-heavy/60">Hours logged</div>
-        <div class="text-xs font-body font-normal text-teal mt-1">Today</div>
+        <h3 class="font-body font-normal text-navy text-sm mb-1">My Tasks</h3>
+        <p class="text-xs text-carbon-heavy/60"><%= @pending_tasks_count %> pending, <%= @active_tasks.count %> active</p>
+      <% end %>
+
+      <!-- Work Logs Card -->
+      <%= link_to work_logs_path, class: "bg-white p-4 rounded-xl border border-cloudy shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group" do %>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-navy/10 rounded-lg flex items-center justify-center group-hover:bg-navy/20 transition-colors">
+            <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <span class="text-2xl font-heading font-medium text-navy"><%= @today_work_logs.sum { |wl| wl.duration_hours.round(1) } %><span class="text-lg font-normal">h</span></span>
+        </div>
+        <h3 class="font-body font-normal text-navy text-sm mb-1">Work Logs</h3>
+        <p class="text-xs text-carbon-heavy/60"><%= @week_work_logs.count %> days this week</p>
+      <% end %>
+
+      <!-- Leave Status Card -->
+      <div class="bg-white p-4 rounded-xl border border-cloudy shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-orange/10 rounded-lg flex items-center justify-center group-hover:bg-orange/20 transition-colors">
+            <svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <span class="text-2xl font-heading font-medium text-navy">
+            <%= current_user.respond_to?(:leave_requests) ? current_user.leave_requests.where(status: 'approved').where('start_date >= ?', Date.current.beginning_of_year).count : 0 %>
+          </span>
+        </div>
+        <h3 class="font-body font-normal text-navy text-sm mb-1">Leave Taken</h3>
+        <p class="text-xs text-carbon-heavy/60">This year</p>
       </div>
-      <div class="bg-white rounded-xl p-4 border border-cloudy shadow-sm">
-        <div class="text-2xl sm:text-3xl font-heading font-medium text-lime mb-1"><%= @active_tasks.count %></div>
-        <div class="text-xs font-body font-light text-carbon-heavy/60">In progress</div>
-        <div class="text-xs font-body font-normal text-lime mt-1">Right now</div>
+
+      <!-- My Assets Card (Future Feature) -->
+      <div class="bg-white p-4 rounded-xl border border-cloudy shadow-sm opacity-60 cursor-not-allowed">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <span class="text-2xl font-heading font-medium text-gray-400">--</span>
+        </div>
+        <h3 class="font-body font-normal text-gray-600 text-sm mb-1">My Assets</h3>
+        <p class="text-xs text-gray-400">Coming soon</p>
       </div>
     </div>
 
-    <!-- Pending Tasks Indicator -->
-    <% if @pending_tasks_count > 0 && !@current_work_log %>
-      <div class="mt-4 bg-teal/5 border border-teal/20 rounded-xl p-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+    <!-- Company Info Section -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <!-- Company Policies Card (Future Feature) -->
+      <div class="bg-white p-4 rounded-xl border border-cloudy shadow-sm opacity-60 cursor-not-allowed">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-body font-normal text-gray-600 text-sm mb-1">Company Policies</h3>
+            <p class="text-xs text-gray-400">Access employee handbook and policies</p>
+          </div>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Holidays Card (Future Feature) -->
+      <div class="bg-white p-4 rounded-xl border border-cloudy shadow-sm opacity-60 cursor-not-allowed">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-body font-normal text-gray-600 text-sm mb-1">Holidays</h3>
+            <p class="text-xs text-gray-400">View company and national holidays</p>
+          </div>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Session Status -->
+    <% if @current_work_log && @current_work_log.tasks.any? %>
+      <div class="bg-white rounded-xl border border-cloudy shadow-sm mb-6">
+        <div class="p-4 border-b border-cloudy">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-heading font-medium text-navy">Current Session</h2>
+            <span class="text-xs font-body font-light text-carbon-heavy/60"><%= @current_work_log.work_log_tasks.count %> tasks</span>
+          </div>
+        </div>
+        <div class="p-4 space-y-3">
+          <% @current_work_log.work_log_tasks.includes(:task).each do |work_log_task| %>
+            <div class="flex items-center gap-3 p-3 bg-carbon-light rounded-lg">
+              <!-- Status Indicator -->
+              <div class="flex-shrink-0">
+                <% if work_log_task.completed? %>
+                  <div class="w-6 h-6 bg-lime rounded-full flex items-center justify-center">
+                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                <% elsif work_log_task.in_progress? %>
+                  <div class="w-6 h-6 bg-teal rounded-full flex items-center justify-center">
+                    <div class="w-2 h-2 bg-white rounded-full"></div>
+                  </div>
+                <% else %>
+                  <div class="w-6 h-6 border-2 border-cloudy rounded-full"></div>
+                <% end %>
+              </div>
+
+              <!-- Task Content -->
+              <div class="flex-1 min-w-0">
+                <h3 class="text-sm font-body font-normal text-navy mb-1 truncate"><%= work_log_task.task.title %></h3>
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-body font-light
+                    <%= case work_log_task.status
+                        when 'planned' then 'bg-cloudy text-carbon-heavy'
+                        when 'in_progress' then 'bg-teal/10 text-teal'
+                        when 'completed' then 'bg-lime/10 text-lime'
+                        else 'bg-gray-100 text-gray-800'
+                        end %>">
+                    <%= work_log_task.status.humanize %>
+                  </span>
+                  <% if work_log_task.task.priority.present? %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-body font-light
+                      <%= case work_log_task.task.priority
+                          when 'high' then 'bg-red-100 text-red-800'
+                          when 'medium' then 'bg-yellow-100 text-yellow-800'
+                          when 'low' then 'bg-lime/10 text-lime'
+                          else 'bg-gray-100 text-gray-800'
+                          end %>">
+                      <%= work_log_task.task.priority.titleize %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex-shrink-0">
+                <% if work_log_task.planned? %>
+                  <%= button_to start_work_log_task_path(work_log_task),
+                      method: :post,
+                      class: "bg-teal hover:bg-teal/90 text-white p-2 rounded-lg transition-colors",
+                      form: { data: { turbo: true } } do %>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  <% end %>
+                <% elsif work_log_task.in_progress? %>
+                  <%= button_to complete_work_log_task_path(work_log_task),
+                      method: :post,
+                      class: "bg-lime hover:bg-lime/90 text-navy p-2 rounded-lg transition-colors",
+                      form: { data: { turbo: true } } do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Add Task Button -->
+        <div class="p-4 border-t border-cloudy">
+          <%= button_to new_task_work_log_path(@current_work_log),
+              method: :get,
+              class: "w-full bg-navy hover:bg-navy/90 text-white py-3 rounded-lg text-sm font-body font-normal transition-colors flex items-center justify-center gap-2",
+              form: { data: { turbo_frame: "task_modal" } } do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add Task to Session</span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Pending Tasks Alert -->
+    <% if @pending_tasks_count > 0 && !@current_work_log %>
+      <div class="bg-teal/5 border border-teal/20 rounded-xl p-4 mb-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-teal rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
             <div>
               <div class="text-sm font-body font-normal text-navy">
                 <%= @pending_tasks_count %> task<%= 's' if @pending_tasks_count != 1 %> waiting
@@ -102,146 +250,72 @@
         </div>
       </div>
     <% end %>
-  </div>
 
-  <!-- Today's Tasks Section -->
-  <% if @current_work_log && @current_work_log.tasks.any? %>
-    <div class="px-4 sm:px-6 mt-6">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-base font-heading font-medium text-navy">Today's work</h2>
-        <span class="text-xs font-body font-light text-carbon-heavy/60"><%= @current_work_log.work_log_tasks.count %> tasks</span>
-      </div>
-      
-      <div class="bg-white rounded-xl border border-cloudy shadow-sm overflow-hidden">
+    <!-- Recent Activity -->
+    <% if @recent_work_logs.any? %>
+      <div class="bg-white rounded-xl border border-cloudy shadow-sm">
+        <div class="p-4 border-b border-cloudy">
+          <h2 class="text-base font-heading font-medium text-navy">Recent Activity</h2>
+        </div>
         <div class="divide-y divide-cloudy">
-          <% @current_work_log.work_log_tasks.includes(:task).each do |work_log_task| %>
+          <% @recent_work_logs.first(3).each do |work_log| %>
             <div class="p-4 hover:bg-carbon-light transition-colors">
-              <div class="flex items-start gap-3">
-                <!-- Status Indicator -->
-                <div class="flex-shrink-0 mt-1">
-                  <% if work_log_task.completed? %>
-                    <div class="w-5 h-5 bg-lime rounded-full flex items-center justify-center">
-                      <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                  <% elsif work_log_task.in_progress? %>
-                    <div class="w-5 h-5 bg-teal rounded-full flex items-center justify-center">
-                      <div class="w-2 h-2 bg-white rounded-full"></div>
-                    </div>
-                  <% else %>
-                    <div class="w-5 h-5 border-2 border-cloudy rounded-full"></div>
-                  <% end %>
-                </div>
-
-                <!-- Task Content -->
+              <div class="flex items-center gap-3">
+                <div class="w-1 h-8 bg-teal rounded-full flex-shrink-0"></div>
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-sm font-body font-normal text-navy mb-1"><%= work_log_task.task.title %></h3>
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-body font-light
-                      <%= case work_log_task.status
-                          when 'planned' then 'bg-cloudy text-carbon-heavy'
-                          when 'in_progress' then 'bg-teal/10 text-teal'
-                          when 'completed' then 'bg-lime/10 text-lime'
-                          when 'paused' then 'bg-yellow-100 text-yellow-800'
-                          else 'bg-gray-100 text-gray-800'
-                          end %>">
-                      <%= work_log_task.status.humanize %>
-                    </span>
-                    <% if work_log_task.task.priority.present? %>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-body font-light
-                        <%= case work_log_task.task.priority
-                            when 'high' then 'bg-red-100 text-red-800'
-                            when 'medium' then 'bg-yellow-100 text-yellow-800'
-                            when 'low' then 'bg-lime/10 text-lime'
-                            else 'bg-gray-100 text-gray-800'
-                            end %>">
-                        <%= work_log_task.task.priority.titleize %>
+                  <div class="text-sm font-body font-normal text-navy mb-0.5">
+                    <%= work_log.punch_in.strftime("%A, %B %d") %>
+                  </div>
+                  <div class="flex items-center gap-2 text-xs font-body font-light text-carbon-heavy/60">
+                    <span><%= work_log.punch_in.strftime("%I:%M %p") %></span>
+                    <% if work_log.punch_out %>
+                      <span>→</span>
+                      <span><%= work_log.punch_out.strftime("%I:%M %p") %></span>
+                    <% else %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-lime/10 text-lime font-body font-normal ml-1">
+                        Active
                       </span>
                     <% end %>
                   </div>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="flex-shrink-0">
-                  <% if work_log_task.planned? %>
-                    <%= button_to start_work_log_task_path(work_log_task),
-                        method: :post,
-                        class: "bg-teal hover:bg-teal/90 text-white p-2 rounded-lg transition-colors",
-                        form: { data: { turbo: true } } do %>
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    <% end %>
-                  <% elsif work_log_task.in_progress? %>
-                    <%= button_to complete_work_log_task_path(work_log_task),
-                        method: :post,
-                        class: "bg-lime hover:bg-lime/90 text-navy p-2 rounded-lg transition-colors",
-                        form: { data: { turbo: true } } do %>
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    <% end %>
-                  <% end %>
-                </div>
+                <% if work_log.punch_out %>
+                  <div class="text-right flex-shrink-0">
+                    <div class="text-base font-heading font-medium text-teal"><%= work_log.duration_hours %><span class="text-xs">h</span></div>
+                    <div class="text-xs font-body font-light text-carbon-heavy/60">logged</div>
+                  </div>
+                <% end %>
               </div>
             </div>
           <% end %>
         </div>
-
-        <!-- Add Task Button -->
-        <div class="p-4 border-t border-cloudy bg-carbon-light">
-          <%= button_to new_task_work_log_path(@current_work_log),
-              method: :get,
-              class: "w-full bg-navy hover:bg-navy/90 text-white py-3 rounded-lg text-sm font-body font-normal transition-colors flex items-center justify-center gap-2",
-              form: { data: { turbo_frame: "task_modal" } } do %>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Add task</span>
-          <% end %>
-        </div>
       </div>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 
-  <!-- Recent Activity -->
-  <% if @recent_work_logs.any? %>
-    <div class="px-4 sm:px-6 mt-6">
-      <h2 class="text-base font-heading font-medium text-navy mb-3">Recent activity</h2>
-      <div class="bg-white rounded-xl border border-cloudy shadow-sm divide-y divide-cloudy">
-        <% @recent_work_logs.first(5).each do |work_log| %>
-          <div class="p-4 hover:bg-carbon-light transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="w-1 h-12 bg-teal rounded-full flex-shrink-0"></div>
-              <div class="flex-1 min-w-0">
-                <div class="text-sm font-body font-normal text-navy mb-0.5">
-                  <%= work_log.punch_in.strftime("%A, %B %d") %>
-                </div>
-                <div class="flex items-center gap-2 text-xs font-body font-light text-carbon-heavy/60">
-                  <span><%= work_log.punch_in.strftime("%I:%M %p") %></span>
-                  <% if work_log.punch_out %>
-                    <span>→</span>
-                    <span><%= work_log.punch_out.strftime("%I:%M %p") %></span>
-                  <% else %>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-lime/10 text-lime font-body font-normal ml-1">
-                      Active
-                    </span>
-                  <% end %>
-                </div>
-              </div>
-              <% if work_log.punch_out %>
-                <div class="text-right flex-shrink-0">
-                  <div class="text-base font-heading font-medium text-teal"><%= work_log.duration_hours %><span class="text-xs">h</span></div>
-                  <div class="text-xs font-body font-light text-carbon-heavy/60">logged</div>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
+  <!-- Floating Action Button -->
+  <div class="fixed bottom-6 right-6 z-40">
+    <% if @current_work_log %>
+      <%= button_to punch_out_work_log_path(@current_work_log),
+          method: :get,
+          class: "bg-red-500 hover:bg-red-600 text-white px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 group min-w-[120px]",
+          form: { data: { turbo_frame: "punch_out_modal" } } do %>
+        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        <span class="text-sm font-body font-medium">Punch Out</span>
+      <% end %>
+    <% else %>
+      <%= button_to punch_in_work_logs_path,
+          method: :post,
+          class: "bg-lime hover:bg-lime/90 text-navy px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 group min-w-[120px]",
+          form: { data: { turbo_frame: "punch_in_modal" } } do %>
+        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+        </svg>
+        <span class="text-sm font-body font-medium">Punch In</span>
+      <% end %>
+    <% end %>
+  </div>
 </div>
 
 <!-- Turbo Frames for modals -->
