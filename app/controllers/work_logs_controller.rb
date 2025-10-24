@@ -2,7 +2,7 @@ class WorkLogsController < ApplicationController
   before_action :require_login
 
   def index
-    @work_logs = current_user.work_logs.order(punch_in: :desc).page(params[:page])
+    @pagy, @work_logs = pagy(current_user.work_logs.order(punch_in: :desc))
   end
 
   def show
