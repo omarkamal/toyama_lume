@@ -1,8 +1,14 @@
 class WorkZone < ApplicationRecord
+  belongs_to :user, optional: true  # nil means it's a global/shared zone
+
   validates :name, presence: true
   validates :latitude, presence: true
   validates :longitude, presence: true
   validates :radius, presence: true, numericality: { greater_than: 0 }
+
+  # Scopes
+  scope :global, -> { where(user_id: nil, active: true) }
+  scope :for_user, ->(user) { where(user_id: user.id, active: true) }
 
   # Check if a point is within this work zone
   def contains?(lat, lng)
