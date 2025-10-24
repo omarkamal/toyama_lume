@@ -1,0 +1,70 @@
+<% content_for :title, "My Tasks" %>
+
+<div class="sm:flex sm:items-center">
+  <div class="sm:flex-auto">
+    <h1 class="text-2xl font-semibold text-gray-900">My Tasks</h1>
+    <p class="mt-2 text-sm text-gray-700">A list of all your personal tasks including their status and priority.</p>
+  </div>
+  <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+    <%= link_to "New Task", new_task_path, class: "inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto" %>
+  </div>
+</div>
+
+<div class="mt-8 flex flex-col">
+  <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+    <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+      <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-300">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Title</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Category</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Priority</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Usage</th>
+              <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @my_tasks.each do |task| %>
+              <tr>
+                <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                  <%= link_to task.title, task_path(task), class: "hover:text-indigo-600" %>
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <%= task.category %>
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <%= task_priority_badge(task.priority) %>
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <%= task.usage_count %> times
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm font-medium sm:pr-6">
+                  <%= link_to "Edit", edit_task_path(task), class: "text-indigo-600 hover:text-indigo-900 mr-3" %>
+                  <%= link_to "Delete", task_path(task), method: :delete,
+                      data: { confirm: "Are you sure?" },
+                      class: "text-red-600 hover:text-red-900" %>
+                </td>
+              </tr>
+            <% end %>
+
+            <% if @my_tasks.empty? %>
+              <tr>
+                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                  No personal tasks found. <%= link_to "Create your first task", new_task_path, class: "text-indigo-600 hover:text-indigo-900" %>.
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pagination -->
+<% if @my_tasks.respond_to?(:total_pages) && @my_tasks.total_pages > 1 %>
+  <div class="mt-6">
+    <%= pagy_nav(@pagy) if @pagy %>
+  </div>
+<% end %>
