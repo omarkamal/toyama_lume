@@ -1,37 +1,52 @@
-<% content_for :title, "Login" %>
+<% content_for :title, "Login - Lume" %>
 
-<div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-md w-full space-y-8">
-    <div>
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Sign in to Lume
-      </h2>
-      <p class="mt-2 text-center text-sm text-gray-600">
-        Toyama's internal workflow app
+<div class="min-h-screen bg-carbon-light font-body flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+  <div class="w-full max-w-md">
+    <!-- Logo Section -->
+    <div class="text-center mb-12">
+      <div class="flex items-center justify-center mb-6">
+        <%= image_tag "toyama_logo.svg", alt: "Toyama", class: "h-12" %>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-heading font-medium text-navy mb-2">
+        Lume
+      </h1>
+      <p class="text-sm font-body font-light text-carbon-heavy/70">
+        Toyama's internal workflow companion
       </p>
     </div>
 
-    <%= form_with url: login_path, class: "mt-8 space-y-6" do |form| %>
-      <div class="rounded-md shadow-sm -space-y-px">
+    <!-- Login Card -->
+    <div class="bg-white rounded-xl border border-cloudy shadow-sm p-8">
+      <%= form_with url: login_path, class: "space-y-6" do |form| %>
+        <!-- Email Field -->
         <div>
-          <%= form.label :email, class: "sr-only" %>
-          <%= form.email_field :email, required: true, autofocus: true, class: "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm", placeholder: "Email address" %>
+          <%= form.label :email, "Email Address", class: "block text-sm font-body font-normal text-navy mb-2" %>
+          <%= form.email_field :email, 
+              required: true, 
+              autofocus: true, 
+              class: "w-full px-4 py-3 bg-carbon-light border border-cloudy text-navy placeholder-carbon-heavy/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent focus:bg-white transition-all font-body font-light", 
+              placeholder: "you@toyama.com" %>
         </div>
+
+        <!-- Password Field -->
         <div>
-          <%= form.label :password, class: "sr-only" %>
-          <%= form.password_field :password, required: true, class: "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm", placeholder: "Password" %>
+          <%= form.label :password, "Password", class: "block text-sm font-body font-normal text-navy mb-2" %>
+          <%= form.password_field :password, 
+              required: true, 
+              class: "w-full px-4 py-3 bg-carbon-light border border-cloudy text-navy placeholder-carbon-heavy/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent focus:bg-white transition-all font-body font-light", 
+              placeholder: "Enter your password" %>
         </div>
-      </div>
 
-      <div>
-        <%= form.submit "Sign in", class: "group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
-      </div>
-    <% end %>
-
-    <div class="text-sm text-center text-gray-600 bg-blue-50 p-4 rounded-md">
-      <p class="font-medium mb-2">Demo Accounts:</p>
-      <p><strong>Admin:</strong> admin@toyama.com / password123</p>
-      <p><strong>Employee:</strong> john@toyama.com / password123</p>
+        <!-- Sign In Button -->
+        <div class="pt-2">
+          <%= form.submit "Sign In", class: "w-full bg-lime hover:bg-lime/90 text-navy px-6 py-3 rounded-lg text-sm font-body font-normal shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" %>
+        </div>
+      <% end %>
     </div>
+
+    <!-- Footer Message -->
+    <p class="text-center text-xs font-body font-light text-carbon-heavy/60 mt-8">
+      Innovation never comes at the cost of service quality.
+    </p>
   </div>
 </div>
