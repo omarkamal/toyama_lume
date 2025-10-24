@@ -3,7 +3,7 @@
     <div class="p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-gray-900">End Your Day</h2>
-        <button onclick="document.getElementById('punch_out_modal').remove()" class="text-gray-400 hover:text-gray-600">
+        <button type="button" onclick="closePunchOutModal()" class="text-gray-400 hover:text-gray-600" data-turbo="false">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
@@ -130,7 +130,8 @@
         <!-- Action Buttons -->
         <div class="flex space-x-3">
           <button type="button"
-                  onclick="document.getElementById('punch_out_modal').remove()"
+                  onclick="closePunchOutModal()"
+                  data-turbo="false"
                   class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
             Cancel
           </button>
@@ -145,6 +146,33 @@
 </div>
 
 <script>
+function closePunchOutModal() {
+  console.log('closePunchOutModal called');
+
+  // Find the turbo frame
+  const frame = document.querySelector('turbo-frame#punch_out_modal') || 
+                document.querySelector('turbo-frame[id="punch_out_modal"]');
+  
+  console.log('Frame found:', frame);
+
+  if (frame) {
+    console.log('Resetting frame by removing src and clearing content');
+    // Remove the src attribute to prevent reloading
+    frame.removeAttribute('src');
+    frame.removeAttribute('complete');
+    // Clear content to remove the modal
+    frame.innerHTML = '';
+    // Force Turbo to mark frame as complete/idle
+    frame.setAttribute('complete', '');
+  } else {
+    console.log('Frame not found, removing modal overlay');
+    const modalOverlay = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+    if (modalOverlay) {
+      modalOverlay.remove();
+    }
+  }
+}
+
 function toggleTaskDuration(taskId) {
   const durationDiv = document.getElementById('duration_' + taskId);
   const checkbox = document.querySelector(`input[value="${taskId}"]`);
