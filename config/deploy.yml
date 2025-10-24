@@ -2,12 +2,13 @@
 service: toyama_lume
 
 # Name of the container image (use your-user/app-name on external registries).
-image: toyama_lume
+image: omarkamal/toyama_lume
 
 # Deploy to these servers.
+# Replace with your actual server IP address
 servers:
   web:
-    - 192.168.0.1
+    - 139.59.67.14
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -17,21 +18,21 @@ servers:
 # Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
 #
 # Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
-# proxy:
-#   ssl: true
-#   host: app.example.com
+proxy:
+  ssl: true
+  host: lume.toyamaworld.com
 
 # Where you keep your container images.
+# GitHub Container Registry
 registry:
-  # Alternatives: hub.docker.com / registry.digitalocean.com / ghcr.io / ...
-  server: localhost:5555
-
-  # Needed for authenticated registries.
-  # username: your-user
-
-  # Always use an access token rather than real password when possible.
-  # password:
-  #   - KAMAL_REGISTRY_PASSWORD
+  server: ghcr.io
+  username: omarkamal
+  
+  # Create a GitHub Personal Access Token with packages:write scope
+  # Settings → Developer settings → Personal access tokens → Generate new token (classic)
+  # Scopes needed: write:packages, read:packages, delete:packages
+  password:
+    - KAMAL_REGISTRY_PASSWORD
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 env:
