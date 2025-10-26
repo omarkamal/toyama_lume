@@ -18,5 +18,14 @@ class DashboardController < ApplicationController
 
     # Get pending tasks count
     @pending_tasks_count = current_user.pending_tasks.count
+
+    # Leave statistics
+    @pending_leave_requests = current_user.leave_requests.pending
+    @upcoming_leave = current_user.upcoming_leave
+    @current_leave = current_user.current_leave
+    @leave_taken_this_year = current_user.leave_taken_this_year
+
+    # Check if user is on leave today
+    @on_leave_today = current_user.leave_on_date?(Date.current)
   end
 end

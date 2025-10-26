@@ -4,7 +4,7 @@
   <h1 class="text-3xl font-bold text-[#10223A] mb-8">Admin Dashboard</h1>
 
   <!-- Stats Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <div class="bg-white rounded-xl border border-[#DBDBDB] p-6 shadow-sm">
       <div class="text-3xl font-medium text-[#10223A] mb-2"><%= @total_users %></div>
       <div class="text-sm text-[#323233]/60">Total Users</div>
@@ -21,7 +21,117 @@
       <div class="text-sm text-[#323233]/60">Work Zones</div>
       <p class="text-xs text-[#323233]/60 mt-2">Configured across all users</p>
     </div>
+
+    <div class="bg-white rounded-xl border border-[#DBDBDB] p-6 shadow-sm relative">
+      <% if @leave_stats[:pending] > 0 %>
+        <div class="absolute -top-2 -right-2 w-8 h-8 bg-orange rounded-full flex items-center justify-center">
+          <span class="text-sm font-bold text-white"><%= @leave_stats[:pending] %></span>
+        </div>
+      <% end %>
+      <div class="text-3xl font-medium text-orange mb-2"><%= @leave_stats[:pending] %></div>
+      <div class="text-sm text-[#323233]/60">Pending Leave</div>
+      <%= link_to "Review →", leave_requests_path(status: 'pending'), class: "text-orange text-sm mt-2 inline-block hover:underline" %>
+    </div>
   </div>
+
+  <!-- Pending Leave Requests -->
+  <% if @pending_leave_requests.any? %>
+    <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden mb-8">
+      <div class="p-6 border-b border-[#DBDBDB]">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-medium text-[#10223A]">Pending Leave Requests</h2>
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange/10 text-orange">
+              <%= @pending_leave_requests.count %> pending
+            </span>
+            <%= link_to "Manage All →", admin_leave_requests_path,
+                class: "text-orange hover:underline text-sm font-medium" %>
+          </div>
+        </div>
+      </div>
+      <div class="divide-y divide-[#DBDBDB]">
+        <% @pending_leave_requests.limit(5).each do |leave_request| %>
+          <div class="p-4 hover:bg-[#F8F7F7] transition-colors">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="font-medium text-[#10223A]"><%= leave_request.user.name %></div>
+                  <span class="text-sm text-[#323233]/60"><%= leave_request.user.email %></span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-orange/10 text-orange">
+                    Pending
+                  </span>
+                </div>
+                <div class="text-sm text-[#323233] mb-2">
+                  <% if leave_request.half_day? %>
+                    <%= leave_request.start_date.strftime("%B %d, %Y") %> (Half Day)
+                  <% elsif leave_request.start_date == leave_request.end_date %>
+                    <%= leave_request.start_date.strftime("%B %d, %Y") %>
+                  <% else %>
+                    <%= leave_request.start_date.strftime("%B %d") %> - <%= leave_request.end_date.strftime("%B %d, %Y") %>
+                  <% end %>
+                  <span class="text-[#323233]/60">• <%= leave_request.duration_days %> day(s) • <%= leave_request.business_days %> business days</span>
+                </div>
+                <% if leave_request.reason.present? %>
+                  <div class="text-sm text-[#323233]/70 mb-3">
+                    <span class="font-medium">Reason:</span> <%= leave_request.reason %>
+                  </div>
+                <% end %>
+                <% if leave_request.holidays_during_leave.any? || leave_request.weekends_during_leave.any? %>
+                  <div class="text-xs text-[#323233]/50 mb-3">
+                    <% if leave_request.holidays_during_leave.any? %>
+                      <span class="inline-flex items-center gap-1 px-2 py-1 bg-orange/10 text-orange rounded">
+                        🎉 <%= leave_request.holidays_during_leave.count %> holiday<%= 's' if leave_request.holidays_during_leave.count > 1 %>
+                      </span>
+                    <% end %>
+                    <% if leave_request.weekends_during_leave.any? %>
+                      <span class="inline-flex items-center gap-1 px-2 py-1 bg-navy/10 text-navy rounded">
+                        📅 <%= leave_request.weekends_during_leave.count %> weekend<%= 's' if leave_request.weekends_during_leave.count > 1 %>
+                      </span>
+                    <% end %>
+                  </div>
+                <% end %>
+                <div class="text-xs text-[#323233]/50">
+                  Requested <%= leave_request.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 ml-4">
+                <%= form_with(url: approve_leave_request_path(leave_request), method: :post, class: "inline") do %>
+                  <button type="submit"
+                    class="bg-green hover:bg-green/90 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1 shadow-sm hover:shadow-md"
+                    title="Approve this leave request">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Approve
+                  </button>
+                <% end %>
+                <%= form_with(url: reject_leave_request_path(leave_request), method: :post,
+                    data: { turbo: true, turbo_confirm: "Are you sure you want to reject this leave request?" },
+                    class: "inline") do %>
+                  <button type="submit"
+                    class="bg-red hover:bg-red/90 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1 shadow-sm hover:shadow-md"
+                    title="Reject this leave request">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Reject
+                  </button>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @pending_leave_requests.count > 5 %>
+          <div class="p-4 bg-[#F8F7F7] text-center">
+            <%= link_to "Manage all #{@pending_leave_requests.count} pending requests →",
+                admin_leave_requests_path,
+                class: "text-orange hover:underline text-sm font-medium" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
   <!-- Quick Actions -->
   <div class="bg-white rounded-xl border border-[#DBDBDB] p-6 shadow-sm mb-8">
@@ -32,34 +142,95 @@
     </div>
   </div>
 
-  <!-- Recent Users -->
-  <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden">
-    <div class="p-6 border-b border-[#DBDBDB]">
-      <h2 class="text-lg font-medium text-[#10223A]">Recent Users</h2>
-    </div>
-    <div class="divide-y divide-[#DBDBDB]">
-      <% @recent_users.each do |user| %>
-        <div class="p-4 hover:bg-[#F8F7F7] transition-colors">
-          <div class="flex items-center justify-between">
-            <div class="flex-1">
-              <div class="font-medium text-[#10223A]"><%= user.name %></div>
-              <div class="text-sm text-[#323233]/60"><%= user.email %></div>
-            </div>
-            <div class="flex items-center gap-3">
-              <% if user.remote %>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-[#97D700]/10 text-[#97D700]">
-                  Remote
+  <!-- Recent Activity Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Recent Users -->
+    <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-[#DBDBDB]">
+        <h2 class="text-lg font-medium text-[#10223A]">Recent Users</h2>
+      </div>
+      <div class="divide-y divide-[#DBDBDB]">
+        <% @recent_users.each do |user| %>
+          <div class="p-4 hover:bg-[#F8F7F7] transition-colors">
+            <div class="flex items-center justify-between">
+              <div class="flex-1">
+                <div class="font-medium text-[#10223A]"><%= user.name %></div>
+                <div class="text-sm text-[#323233]/60"><%= user.email %></div>
+              </div>
+              <div class="flex items-center gap-3">
+                <% if user.remote %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-[#97D700]/10 text-[#97D700]">
+                    Remote
+                  </span>
+                <% end %>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium
+                  <%= user.admin? ? 'bg-[#226A73]/10 text-[#226A73]' : 'bg-[#DBDBDB] text-[#323233]' %>">
+                  <%= user.role.titleize %>
                 </span>
-              <% end %>
-              <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium
-                <%= user.admin? ? 'bg-[#226A73]/10 text-[#226A73]' : 'bg-[#DBDBDB] text-[#323233]' %>">
-                <%= user.role.titleize %>
-              </span>
-              <%= link_to "View", admin_user_path(user), class: "text-[#226A73] text-sm hover:underline" %>
+                <%= link_to "View", admin_user_path(user), class: "text-[#226A73] text-sm hover:underline" %>
+              </div>
             </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Recent Leave Requests -->
+    <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-[#DBDBDB]">
+        <h2 class="text-lg font-medium text-[#10223A]">Recent Leave Activity</h2>
+      </div>
+      <div class="divide-y divide-[#DBDBDB]">
+        <% if @recent_leave_requests.any? %>
+          <% @recent_leave_requests.each do |leave_request| %>
+            <div class="p-4 hover:bg-[#F8F7F7] transition-colors">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3 mb-2">
+                    <div class="font-medium text-[#10223A]"><%= leave_request.user.name %></div>
+                    <!-- Status Badge -->
+                    <% if leave_request.pending? %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-orange/10 text-orange">
+                        Pending
+                      </span>
+                    <% elsif leave_request.approved? %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green/10 text-green">
+                        Approved
+                      </span>
+                    <% else %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red/10 text-red">
+                        Rejected
+                      </span>
+                    <% end %>
+                  </div>
+                  <div class="text-sm text-[#323233] mb-2">
+                    <% if leave_request.half_day? %>
+                      <%= leave_request.start_date.strftime("%B %d, %Y") %> (Half Day)
+                    <% elsif leave_request.start_date == leave_request.end_date %>
+                      <%= leave_request.start_date.strftime("%B %d, %Y") %>
+                    <% else %>
+                      <%= leave_request.start_date.strftime("%B %d") %> - <%= leave_request.end_date.strftime("%B %d, %Y") %>
+                    <% end %>
+                  </div>
+                  <div class="text-xs text-[#323233]/50">
+                    <% if leave_request.approved? && leave_request.approved_by %>
+                      Approved by <%= leave_request.approved_by.name %> •
+                    <% end %>
+                    <%= leave_request.created_at.strftime("%B %d, %Y") %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="p-8 text-center text-[#323233]/60">
+            <svg class="w-12 h-12 mx-auto mb-3 text-[#323233]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p class="text-sm">No leave activity yet</p>
+          </div>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>

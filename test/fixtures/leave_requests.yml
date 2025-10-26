@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  start_date: 2025-10-24
+  end_date: 2025-10-24
+  half_day: false
+  reason: MyText
+  status: MyString
+  approved_by: one
+
+two:
+  user: two
+  start_date: 2025-10-24
+  end_date: 2025-10-24
+  half_day: false
+  reason: MyText
+  status: MyString
+  approved_by: two

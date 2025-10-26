@@ -1,0 +1,198 @@
+<% content_for :title, "Leave Requests" %>
+
+<div class="min-h-screen bg-carbon-light">
+  <!-- Header -->
+  <div class="bg-white border-b border-cloudy px-4 py-4 sm:px-6">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <%= link_to root_path, class: "inline-flex items-center gap-2 text-carbon-heavy/60 hover:text-navy transition-colors" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span class="text-sm font-body font-normal">Back to Dashboard</span>
+        <% end %>
+
+        <div>
+          <h1 class="text-xl font-heading font-medium text-navy">Leave Requests</h1>
+          <p class="text-carbon-heavy/60 text-sm font-body font-light">
+            Manage your time-off requests
+          </p>
+        </div>
+      </div>
+
+      <%= link_to new_leave_request_path, class: "inline-flex items-center gap-2 bg-lime text-navy px-4 py-2 rounded-lg font-body font-normal hover:bg-lime/90 transition-colors" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>New Request</span>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="px-4 py-6 max-w-6xl mx-auto">
+    <!-- Status Filter Tabs -->
+    <div class="bg-white rounded-xl border border-cloudy shadow-sm mb-6">
+      <div class="flex border-b border-cloudy">
+        <%= link_to leave_requests_path, class: "flex-1 px-4 py-3 text-center font-body font-normal text-sm #{params[:status].blank? ? 'text-navy border-b-2 border-teal bg-teal/5' : 'text-carbon-heavy/60 hover:text-navy'} transition-colors" do %>
+          All (<%= @leave_requests.count %>)
+        <% end %>
+        <%= link_to leave_requests_path(status: 'pending'), class: "flex-1 px-4 py-3 text-center font-body font-normal text-sm #{params[:status] == 'pending' ? 'text-navy border-b-2 border-orange bg-orange/5' : 'text-carbon-heavy/60 hover:text-navy'} transition-colors" do %>
+          Pending (<%= @pending_requests.count %>)
+        <% end %>
+        <%= link_to leave_requests_path(status: 'approved'), class: "flex-1 px-4 py-3 text-center font-body font-normal text-sm #{params[:status] == 'approved' ? 'text-navy border-b-2 border-green bg-green/5' : 'text-carbon-heavy/60 hover:text-navy'} transition-colors" do %>
+          Approved (<%= @approved_requests.count %>)
+        <% end %>
+        <%= link_to leave_requests_path(status: 'rejected'), class: "flex-1 px-4 py-3 text-center font-body font-normal text-sm #{params[:status] == 'rejected' ? 'text-navy border-b-2 border-red bg-red/5' : 'text-carbon-heavy/60 hover:text-navy'} transition-colors" do %>
+          Rejected (<%= @rejected_requests.count %>)
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Leave Requests List -->
+    <% if @leave_requests.any? %>
+      <div class="space-y-4">
+        <% @leave_requests.each do |leave_request| %>
+          <div class="bg-white rounded-xl border border-cloudy shadow-sm p-6 hover:shadow-md transition-shadow">
+            <!-- Header Row -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <!-- Status Badge -->
+                  <% if leave_request.pending? %>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-body font-normal bg-orange/10 text-orange">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                      </svg>
+                      Pending
+                    </span>
+                  <% elsif leave_request.approved? %>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-body font-normal bg-green/10 text-green">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                      </svg>
+                      Approved
+                    </span>
+                  <% else %>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-body font-normal bg-red/10 text-red">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                      </svg>
+                      Rejected
+                    </span>
+                  <% end %>
+
+                  <!-- Date Range -->
+                  <span class="text-navy font-body font-medium">
+                    <% if leave_request.half_day? %>
+                      <%= leave_request.start_date.strftime("%B %d, %Y") %> (Half Day)
+                    <% elsif leave_request.start_date == leave_request.end_date %>
+                      <%= leave_request.start_date.strftime("%B %d, %Y") %>
+                    <% else %>
+                      <%= leave_request.start_date.strftime("%B %d") %> - <%= leave_request.end_date.strftime("%B %d, %Y") %>
+                    <% end %>
+                  </span>
+                </div>
+
+                <!-- Duration and Business Days -->
+                <div class="flex items-center gap-4 text-sm text-carbon-heavy/60">
+                  <span>
+                    <% if leave_request.half_day? %>
+                      0.5 day
+                    <% else %>
+                      <%= leave_request.duration_days %> <%= leave_request.duration_days == 1 ? 'day' : 'days' %>
+                      (<%= leave_request.business_days %> business days)
+                    <% end %>
+                  </span>
+                  <% if leave_request.approved? && leave_request.approved_by %>
+                    <span>• Approved by <%= leave_request.approved_by.name %></span>
+                  <% end %>
+                </div>
+
+                <!-- Holidays and Weekends Info -->
+                <% unless leave_request.half_day? %>
+                  <% holidays_during = leave_request.holidays_during_leave %>
+                  <% weekends_during = leave_request.weekends_during_leave %>
+                  <% if holidays_during.any? || weekends_during.any? %>
+                    <div class="flex items-center gap-2 text-xs text-carbon-heavy/50 mt-2">
+                      <% if holidays_during.any? %>
+                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-orange/10 text-orange rounded">
+                          🎉 <%= holidays_during.count %> holiday<%= holidays_during.count == 1 ? '' : 's' %>
+                        </span>
+                      <% end %>
+                      <% if weekends_during.any? %>
+                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-navy/10 text-navy rounded">
+                          📅 <%= weekends_during.count %> weekend<%= weekends_during.count == 1 ? '' : 's' %>
+                        </span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex items-center gap-2">
+                <% if leave_request.pending? %>
+                  <%= link_to edit_leave_request_path(leave_request), class: "inline-flex items-center gap-1 text-teal hover:text-teal/80 transition-colors", title: "Edit" do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  <% end %>
+                  <%= link_to leave_request_path(leave_request), method: :delete,
+                      data: { confirm: "Are you sure you want to delete this leave request?" },
+                      class: "inline-flex items-center gap-1 text-red hover:text-red/80 transition-colors",
+                      title: "Delete" do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+
+            <!-- Reason -->
+            <% if leave_request.reason.present? %>
+              <div class="text-sm text-carbon-heavy mb-4">
+                <span class="font-medium">Reason:</span> <%= leave_request.reason %>
+              </div>
+            <% end %>
+
+            <!-- Footer Info -->
+            <div class="flex items-center justify-between text-xs text-carbon-heavy/50">
+              <span>Requested <%= leave_request.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+              <% if leave_request.start_date.past? && leave_request.end_date.past? %>
+                <span class="text-carbon-heavy/40">Past leave</span>
+              <% elsif leave_request.start_date <= Date.current && leave_request.end_date >= Date.current %>
+                <span class="text-teal font-medium">Currently on leave</span>
+              <% elsif leave_request.start_date.future? %>
+                <span class="text-orange font-medium">Upcoming leave</span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <!-- Empty State -->
+      <div class="bg-white rounded-xl border border-cloudy shadow-sm p-12 text-center">
+        <div class="w-16 h-16 bg-carbon-light rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-carbon-heavy/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-heading font-medium text-navy mb-2">No Leave Requests</h3>
+        <p class="text-carbon-heavy/60 text-sm mb-6">
+          <% if params[:status].present? %>
+            You don't have any <%= params[:status] %> leave requests.
+          <% else %>
+            You haven't submitted any leave requests yet.
+          <% end %>
+        </p>
+        <%= link_to new_leave_request_path, class: "inline-flex items-center gap-2 bg-lime text-navy px-4 py-2 rounded-lg font-body font-normal hover:bg-lime/90 transition-colors" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Submit First Request</span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

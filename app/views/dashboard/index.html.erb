@@ -29,6 +29,38 @@
     </div>
   </div>
 
+  <!-- Leave Status Alert -->
+  <% if @on_leave_today && @current_leave %>
+    <div class="px-4 py-2">
+      <div class="bg-orange/5 border border-orange/20 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-orange rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-sm font-body font-medium text-navy">
+                Currently on Leave
+              </div>
+              <div class="text-xs font-body font-light text-carbon-heavy/70">
+                <% if @current_leave.start_date == @current_leave.end_date %>
+                  Leave for today: <%= @current_leave.start_date.strftime("%B %d, %Y") %>
+                <% else %>
+                  Leave period: <%= @current_leave.start_date.strftime("%B %d") %> - <%= @current_leave.end_date.strftime("%B %d, %Y") %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="text-xs font-body font-light text-orange">
+            Time-off approved
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <!-- Quick Actions Grid -->
   <div class="px-4 py-6">
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
@@ -60,21 +92,38 @@
         <p class="text-xs text-carbon-heavy/60"><%= @week_work_logs.count %> days this week</p>
       <% end %>
 
-      <!-- Leave Status Card -->
-      <div class="bg-white p-4 rounded-xl border border-cloudy shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group">
+      <!-- Leave Management Card -->
+      <%= link_to leave_requests_path, class: "bg-white p-4 rounded-xl border border-cloudy shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group relative" do %>
+        <% if @pending_leave_requests.any? %>
+          <div class="absolute -top-2 -right-2 w-6 h-6 bg-orange rounded-full flex items-center justify-center">
+            <span class="text-xs font-heading font-medium text-white"><%= @pending_leave_requests.count %></span>
+          </div>
+        <% end %>
+
         <div class="flex items-center gap-3 mb-2">
           <div class="w-10 h-10 bg-orange/10 rounded-lg flex items-center justify-center group-hover:bg-orange/20 transition-colors">
             <svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <span class="text-2xl font-heading font-medium text-navy">
-            <%= current_user.respond_to?(:leave_requests) ? current_user.leave_requests.where(status: 'approved').where('start_date >= ?', Date.current.beginning_of_year).count : 0 %>
-          </span>
+          <div>
+            <span class="text-2xl font-heading font-medium text-navy"><%= @leave_taken_this_year %></span>
+            <% if @pending_leave_requests.any? %>
+              <div class="text-xs font-body font-normal text-orange mt-1">Pending requests</div>
+            <% end %>
+          </div>
         </div>
-        <h3 class="font-body font-normal text-navy text-sm mb-1">Leave Taken</h3>
-        <p class="text-xs text-carbon-heavy/60">This year</p>
-      </div>
+        <h3 class="font-body font-normal text-navy text-sm mb-1">Leave Management</h3>
+        <p class="text-xs text-carbon-heavy/60">
+          <% if @current_leave %>
+            Currently on leave
+          <% elsif @upcoming_leave %>
+            Upcoming: <%= @upcoming_leave.start_date.strftime("%b %d") %>
+          <% else %>
+            <%= @leave_taken_this_year %> days taken this year
+          <% end %>
+        </p>
+      <% end %>
 
       <!-- My Assets Card (Future Feature) -->
       <div class="bg-white p-4 rounded-xl border border-cloudy shadow-sm opacity-60 cursor-not-allowed">

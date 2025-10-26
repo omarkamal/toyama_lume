@@ -1,0 +1,211 @@
+<% content_for :title, "Edit Leave Request" %>
+
+<div class="min-h-screen bg-carbon-light">
+  <!-- Header -->
+  <div class="bg-white border-b border-cloudy px-4 py-4 sm:px-6">
+    <div class="flex items-center gap-4">
+      <%= link_to leave_requests_path, class: "inline-flex items-center gap-2 text-carbon-heavy/60 hover:text-navy transition-colors" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span class="text-sm font-body font-normal">Back to Leave Requests</span>
+      <% end %>
+
+      <div class="flex-1">
+        <h1 class="text-xl font-heading font-medium text-navy">Edit Leave Request</h1>
+        <p class="text-carbon-heavy/60 text-sm font-body font-light">
+          Update your time-off request details
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 py-6">
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-white rounded-xl border border-cloudy shadow-sm p-6">
+        <%= form_with(model: @leave_request, local: true, class: "space-y-6") do |form| %>
+          <%= render 'shared/errors', object: @leave_request %>
+
+          <!-- Leave Type Selection -->
+          <div class="space-y-3">
+            <label class="block text-sm font-heading font-medium text-navy">Leave Type</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="relative flex items-center p-4 border-2 border-cloudy rounded-lg cursor-pointer hover:border-teal hover:bg-teal/5 transition-all <%= 'border-teal bg-teal/5' unless @leave_request.half_day? %>">
+                <%= form.radio_button :half_day, false, class: "sr-only peer", checked: !@leave_request.half_day? %>
+                <div class="flex items-center gap-3">
+                  <div class="w-5 h-5 rounded-full border-2 border-cloudy peer-checked:border-teal peer-checked:bg-teal flex items-center justify-center <%= 'border-teal bg-teal' unless @leave_request.half_day? %>">
+                    <div class="w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity <%= 'opacity-100' unless @leave_request.half_day? %>"></div>
+                  </div>
+                  <div>
+                    <div class="font-body font-medium text-navy">Full Day</div>
+                    <div class="text-xs text-carbon-heavy/60">Entire day(s) off</div>
+                  </div>
+                </div>
+              </label>
+
+              <label class="relative flex items-center p-4 border-2 border-cloudy rounded-lg cursor-pointer hover:border-teal hover:bg-teal/5 transition-all <%= 'border-teal bg-teal/5' if @leave_request.half_day? %>">
+                <%= form.radio_button :half_day, true, class: "sr-only peer", checked: @leave_request.half_day? %>
+                <div class="flex items-center gap-3">
+                  <div class="w-5 h-5 rounded-full border-2 border-cloudy peer-checked:border-teal peer-checked:bg-teal flex items-center justify-center <%= 'border-teal bg-teal' if @leave_request.half_day? %>">
+                    <div class="w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity <%= 'opacity-100' if @leave_request.half_day? %>"></div>
+                  </div>
+                  <div>
+                    <div class="font-body font-medium text-navy">Half Day</div>
+                    <div class="text-xs text-carbon-heavy/60">Half day off</div>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Date Selection -->
+          <div class="space-y-3">
+            <label class="block text-sm font-heading font-medium text-navy">Dates</label>
+
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Start Date -->
+              <div>
+                <%= form.label :start_date, "Start Date", class: "block text-sm font-body font-normal text-carbon-heavy mb-2" %>
+                <%= form.date_field :start_date,
+                    class: "w-full px-3 py-2 border border-cloudy rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent font-body font-normal text-navy",
+                    min: Date.current - 7.days,
+                    max: Date.current + 1.year,
+                    required: true %>
+              </div>
+
+              <!-- End Date -->
+              <div id="end-date-field" style="<%= 'display: none' if @leave_request.half_day? %>">
+                <%= form.label :end_date, "End Date", class: "block text-sm font-body font-normal text-carbon-heavy mb-2" %>
+                <%= form.date_field :end_date,
+                    class: "w-full px-3 py-2 border border-cloudy rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent font-body font-normal text-navy",
+                    min: Date.current - 7.days,
+                    max: Date.current + 1.year,
+                    required: true %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Duration Preview -->
+          <div class="p-4 bg-carbon-light rounded-lg">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div class="text-sm">
+                <span class="font-body font-medium text-navy">Duration: </span>
+                <span id="duration-text" class="text-carbon-heavy">
+                  <% if @leave_request.half_day? %>
+                    0.5 day
+                  <% elsif @leave_request.start_date == @leave_request.end_date %>
+                    1 day (1 business day)
+                  <% else %>
+                    <%= @leave_request.duration_days %> days (<%= @leave_request.business_days %> business days)
+                  <% end %>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reason (Optional) -->
+          <div class="space-y-3">
+            <%= form.label :reason, "Reason (Optional)", class: "block text-sm font-heading font-medium text-navy" %>
+            <%= form.text_area :reason,
+                rows: 3,
+                placeholder: "Optional: Provide any additional context for your leave request...",
+                class: "w-full px-3 py-2 border border-cloudy rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent font-body font-normal text-navy resize-none" %>
+            <p class="text-xs text-carbon-heavy/50">
+              Adding a reason helps your manager understand your request better.
+            </p>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex items-center gap-4 pt-4">
+            <%= link_to leave_requests_path, class: "flex-1 text-center px-4 py-2 border border-cloudy text-navy rounded-lg font-body font-normal hover:bg-carbon-light transition-colors" do %>
+              Cancel
+            <% end %>
+
+            <%= form.submit "Update Request",
+                class: "flex-1 bg-lime text-navy px-4 py-2 rounded-lg font-body font-medium hover:bg-lime/90 transition-colors" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const halfDayRadio = document.getElementById('leave_request_half_day_true');
+  const fullDayRadio = document.getElementById('leave_request_half_day_false');
+  const endDateField = document.getElementById('end-date-field');
+  const startDateInput = document.getElementById('leave_request_start_date');
+  const endDateInput = document.getElementById('leave_request_end_date');
+  const durationText = document.getElementById('duration-text');
+
+  function updateDuration() {
+    const startDate = new Date(startDateInput.value);
+    const endDate = new Date(endDateInput.value);
+    const isHalfDay = halfDayRadio.checked;
+
+    if (startDateInput.value && (isHalfDay || endDateInput.value)) {
+      if (isHalfDay) {
+        durationText.textContent = '0.5 day';
+      } else if (startDate && endDate && startDate <= endDate) {
+        const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+        // Calculate business days
+        let businessDays = 0;
+        const currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+          const dayOfWeek = currentDate.getDay();
+          if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Not Sunday (0) or Saturday (6)
+            businessDays++;
+          }
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        if (days === 1) {
+          durationText.textContent = '1 day (1 business day)';
+        } else {
+          durationText.textContent = `${days} days (${businessDays} business days)`;
+        }
+      } else {
+        durationText.textContent = 'Select valid dates';
+      }
+    } else {
+      durationText.textContent = 'Select dates to see duration';
+    }
+  }
+
+  function toggleEndDateField() {
+    if (halfDayRadio.checked) {
+      endDateField.style.display = 'none';
+      // Set end date to start date for half day
+      if (startDateInput.value) {
+        endDateInput.value = startDateInput.value;
+      }
+    } else {
+      endDateField.style.display = 'block';
+    }
+    updateDuration();
+  }
+
+  // Event listeners
+  halfDayRadio.addEventListener('change', toggleEndDateField);
+  fullDayRadio.addEventListener('change', toggleEndDateField);
+  startDateInput.addEventListener('change', function() {
+    if (halfDayRadio.checked) {
+      endDateInput.value = startDateInput.value;
+    }
+    if (endDateInput.value && new Date(startDateInput.value) > new Date(endDateInput.value)) {
+      endDateInput.value = startDateInput.value;
+    }
+    updateDuration();
+  });
+  endDateInput.addEventListener('change', updateDuration);
+
+  // Initialize
+  toggleEndDateField();
+});
+</script>

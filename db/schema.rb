@@ -10,7 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_24_092557) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_24_134659) do
+  create_table "leave_requests", force: :cascade do |t|
+    t.datetime "approved_at"
+    t.integer "approved_by_id"
+    t.datetime "created_at", null: false
+    t.date "end_date", null: false
+    t.boolean "half_day", default: false
+    t.text "reason"
+    t.date "start_date", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["approved_by_id"], name: "index_leave_requests_on_approved_by_id"
+    t.index ["status"], name: "index_leave_requests_on_status"
+    t.index ["user_id", "start_date"], name: "index_leave_requests_on_user_id_and_start_date"
+    t.index ["user_id", "status"], name: "index_leave_requests_on_user_id_and_status"
+    t.index ["user_id"], name: "index_leave_requests_on_user_id"
+  end
+
   create_table "tasks", force: :cascade do |t|
     t.string "category"
     t.datetime "created_at", null: false
@@ -73,6 +91,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_24_092557) do
     t.index ["user_id"], name: "index_work_zones_on_user_id"
   end
 
+  add_foreign_key "leave_requests", "users"
+  add_foreign_key "leave_requests", "users", column: "approved_by_id"
   add_foreign_key "tasks", "users"
   add_foreign_key "work_log_tasks", "tasks"
   add_foreign_key "work_log_tasks", "work_logs"

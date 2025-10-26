@@ -21,20 +21,8 @@ class HolidaysController < ApplicationController
         all_holidays << {
           name: holiday['name'],
           date: Date.parse(holiday['date']),
-          company_only: true,
-          type: 'company'
-        }
-      end
-    end
-
-    # Add national holidays
-    if yaml_data['national_holidays_japan']
-      yaml_data['national_holidays_japan'].each do |holiday|
-        all_holidays << {
-          name: holiday['name'],
-          date: Date.parse(holiday['date']),
-          company_only: false,
-          type: 'national'
+          company_only: holiday['company_only'],
+          type: holiday['company_only'] ? 'company' : 'public'
         }
       end
     end

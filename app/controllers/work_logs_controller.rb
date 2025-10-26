@@ -10,6 +10,13 @@ class WorkLogsController < ApplicationController
   end
 
   def punch_in
+    # Check if user is on approved leave today
+    if current_user.leave_on_date?(Date.current)
+      current_leave = current_user.current_leave
+      redirect_to root_path, alert: "You're on approved leave today (#{current_leave.start_date.strftime('%B %d')} - #{current_leave.end_date.strftime('%B %d')}). You cannot punch in while on leave."
+      return
+    end
+
     # Check if user already has an active work log
     active_work_log = current_user.work_logs.where(punch_out: nil).first
 

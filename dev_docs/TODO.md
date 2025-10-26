@@ -88,6 +88,14 @@
 - ✅ **Employee Handbook** - Complete PDF catalog with inline viewer
 - ✅ **Holidays system** - Company and Japanese national holidays
 - ✅ **Enhanced dashboard cards** - Direct access to all features
+- ✅ **Leave Management System** - Complete time-off request and approval workflow
+  - Full-day and half-day leave requests with date validation
+  - Business day calculation excluding weekends and holidays
+  - Admin approval workflow with pending/approved/rejected status
+  - Holiday integration showing holidays during leave periods
+  - Leave conflict prevention and punch-in/out restrictions
+  - Mobile-first leave request forms with real-time duration preview
+  - Dashboard integration showing leave statistics and upcoming leave
 
 **Major Enhancements Added:**
 1. **Complete geofencing system** - Employees can only punch in/out from approved locations
@@ -101,11 +109,12 @@
 9. **Employee Handbook** - Complete PDF catalog with 15 documents and inline viewer
 10. **Holidays system** - Static YAML-based holiday management with clean tables
 
+**✅ COMPLETED - Leave Management System** - Time-off request and approval workflow with holiday integration
+
 **Next Priority Features:**
-1. **🔄 Leave Management System** - Time-off request and approval workflow (MAJOR MISSING PIECE)
-2. **Admin Dashboard Analytics** - Team mood trends, attendance patterns, task insights
-3. **Advanced search functionality** - For policies, work logs, and admin features
-4. **System testing suite** - Comprehensive testing for production readiness
+1. **Admin Dashboard Analytics** - Team mood trends, attendance patterns, task insights
+2. **Advanced search functionality** - For policies, work logs, and admin features
+3. **System testing suite** - Comprehensive testing for production readiness
 
 **Live Demo:**
 - 🔗 **URL**: http://localhost:3000

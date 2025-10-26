@@ -12,18 +12,18 @@
       <% end %>
 
       <div class="flex-1">
-        <h1 class="text-xl font-heading font-medium text-navy">Company Holidays</h1>
+        <h1 class="text-xl font-heading font-medium text-navy">Holidays</h1>
         <p class="text-carbon-heavy/60 text-sm font-body font-light">
-          <%= @current_year %> Holidays and Observances
+          <%= @current_year %> Company Holidays & Observances
         </p>
       </div>
     </div>
   </div>
 
   <div class="max-w-4xl mx-auto px-4 py-6">
-    <!-- Company Holidays Section -->
-    <div class="bg-white rounded-xl border border-cloudy shadow-sm p-6 mb-6">
-      <div class="flex items-center gap-3 mb-4">
+    <!-- Holidays Section -->
+    <div class="bg-white rounded-xl border border-cloudy shadow-sm p-6">
+      <div class="flex items-center gap-3 mb-6">
         <div class="w-10 h-10 bg-teal/10 rounded-lg flex items-center justify-center">
           <svg class="w-5 h-5 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -31,12 +31,11 @@
         </div>
         <div>
           <h2 class="text-lg font-heading font-medium text-navy">Company Holidays</h2>
-          <p class="text-sm text-carbon-heavy/60">Toyama-specific holidays and celebrations</p>
+          <p class="text-sm text-carbon-heavy/60">Official holidays for the Toyama team</p>
         </div>
       </div>
 
-      <% company_holidays = @holidays.select { |h| h[:company_only] } %>
-      <% if company_holidays.any? %>
+      <% if @holidays.any? %>
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
@@ -44,10 +43,11 @@
                 <th class="text-left py-3 px-4 text-sm font-heading font-medium text-navy">Date</th>
                 <th class="text-left py-3 px-4 text-sm font-heading font-medium text-navy">Holiday</th>
                 <th class="text-left py-3 px-4 text-sm font-heading font-medium text-navy">Day</th>
+                <th class="text-left py-3 px-4 text-sm font-heading font-medium text-navy">Type</th>
               </tr>
             </thead>
             <tbody>
-              <% company_holidays.each do |holiday| %>
+              <% @holidays.each do |holiday| %>
                 <tr class="border-b border-cloudy/50 hover:bg-carbon-light transition-colors">
                   <td class="py-3 px-4 text-sm font-body font-normal text-navy">
                     <%= holiday[:date].strftime("%B %d, %Y") %>
@@ -60,66 +60,37 @@
                       <%= holiday[:date].strftime("%A") %>
                     </span>
                   </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      <% else %>
-        <div class="text-center py-8">
-          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <p class="text-gray-500 text-sm">No company holidays scheduled for <%= @current_year %></p>
-        </div>
-      <% end %>
-    </div>
-
-    <!-- National Holidays Section -->
-    <div class="bg-white rounded-xl border border-cloudy shadow-sm p-6">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 bg-navy/10 rounded-lg flex items-center justify-center">
-          <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-          </svg>
-        </div>
-        <div>
-          <h2 class="text-lg font-heading font-medium text-navy">National Holidays (Japan)</h2>
-          <p class="text-sm text-carbon-heavy/60">Official public holidays in Japan</p>
-        </div>
-      </div>
-
-      <% national_holidays = @holidays.select { |h| !h[:company_only] } %>
-      <% if national_holidays.any? %>
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="border-b border-cloudy">
-                <th class="text-left py-3 px-4 text-sm font-heading font-medium text-navy">Date</th>
-                <th class="text-left py-3 px-4 text-sm font-heading font-medium text-navy">Holiday</th>
-                <th class="text-left py-3 px-4 text-sm font-heading font-medium text-navy">Day</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% national_holidays.each do |holiday| %>
-                <tr class="border-b border-cloudy/50 hover:bg-carbon-light transition-colors">
-                  <td class="py-3 px-4 text-sm font-body font-normal text-navy">
-                    <%= holiday[:date].strftime("%B %d, %Y") %>
-                  </td>
-                  <td class="py-3 px-4 text-sm font-body font-normal text-navy">
-                    <%= holiday[:name] %>
-                  </td>
                   <td class="py-3 px-4">
-                    <span class="inline-flex items-center px-3 py-1 rounded-md text-sm font-body font-light bg-navy/10 text-navy">
-                      <%= holiday[:date].strftime("%A") %>
-                    </span>
+                    <% if holiday[:company_only] %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-body font-light bg-lime/10 text-lime">
+                        Company
+                      </span>
+                    <% else %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-body font-light bg-navy/10 text-navy">
+                        Public
+                      </span>
+                    <% end %>
                   </td>
                 </tr>
               <% end %>
             </tbody>
           </table>
+        </div>
+
+        <!-- Note -->
+        <div class="mt-6 p-4 bg-carbon-light rounded-lg">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-carbon-heavy/60 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h4 class="text-sm font-heading font-medium text-navy mb-1">Holiday Information</h4>
+              <p class="text-sm text-carbon-heavy/70">
+                This list shows all holidays observed by the Toyama team for <%= @current_year %>.
+                These holidays are automatically excluded from business day calculations in leave requests.
+              </p>
+            </div>
+          </div>
         </div>
       <% else %>
         <div class="text-center py-8">
@@ -128,25 +99,9 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <p class="text-gray-500 text-sm">No national holidays data available</p>
+          <p class="text-gray-500 text-sm">No holidays scheduled for <%= @current_year %></p>
         </div>
       <% end %>
-
-      <!-- Note -->
-      <div class="mt-6 p-4 bg-carbon-light rounded-lg">
-        <div class="flex items-start gap-3">
-          <svg class="w-5 h-5 text-carbon-heavy/60 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <h4 class="text-sm font-heading font-medium text-navy mb-1">Holiday Information</h4>
-            <p class="text-sm text-carbon-heavy/70">
-              This list shows both company-specific holidays and Japanese national holidays for <%= @current_year %>.
-              Please note that national holidays follow the Japanese calendar and may be subject to official announcements.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>

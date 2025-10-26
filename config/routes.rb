@@ -46,6 +46,17 @@ Rails.application.routes.draw do
     end
   end
 
+  # Leave Requests
+  resources :leave_requests do
+    collection do
+      get :status_filter
+    end
+    member do
+      post :approve
+      post :reject
+    end
+  end
+
   # Static Content
   get "holidays", to: "holidays#index"
   get "employee-handbook", to: "employee_handbook#index"
@@ -61,6 +72,16 @@ Rails.application.routes.draw do
     resources :tasks, only: [ :index, :show, :destroy ] do
       member do
         post :toggle_global
+      end
+    end
+    resources :leave_requests, only: [:index, :show] do
+      collection do
+        post :bulk_approve
+        post :bulk_reject
+      end
+      member do
+        post :approve
+        post :reject
       end
     end
   end
