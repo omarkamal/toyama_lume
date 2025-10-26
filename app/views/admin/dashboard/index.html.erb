@@ -1,7 +1,7 @@
 <% content_for :title, "Admin Dashboard" %>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <h1 class="text-3xl font-bold text-[#10223A] mb-8">Admin Dashboard</h1>
+  <h1 class="text-xl font-heading font-medium text-navy mb-8">Admin Dashboard</h1>
 
   <!-- Stats Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -39,7 +39,7 @@
     <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden mb-8">
       <div class="p-6 border-b border-[#DBDBDB]">
         <div class="flex items-center justify-between">
-          <h2 class="text-lg font-medium text-[#10223A]">Pending Leave Requests</h2>
+          <h2 class="text-lg font-heading font-medium text-navy">Pending Leave Requests</h2>
           <div class="flex items-center gap-3">
             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange/10 text-orange">
               <%= @pending_leave_requests.count %> pending
@@ -135,7 +135,7 @@
 
   <!-- Quick Actions -->
   <div class="bg-white rounded-xl border border-[#DBDBDB] p-6 shadow-sm mb-8">
-    <h2 class="text-lg font-medium text-[#10223A] mb-4">Quick Actions</h2>
+    <h2 class="text-lg font-heading font-medium text-navy mb-4">Quick Actions</h2>
     <div class="flex flex-wrap gap-3">
       <%= link_to "Manage Users", admin_users_path, class: "bg-[#10223A] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#10223A]/90 transition-colors" %>
       <%= link_to "Task Templates", admin_tasks_path, class: "bg-[#97D700] text-[#10223A] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#97D700]/90 transition-colors" %>
@@ -147,7 +147,7 @@
     <!-- Recent Users -->
     <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden">
       <div class="p-6 border-b border-[#DBDBDB]">
-        <h2 class="text-lg font-medium text-[#10223A]">Recent Users</h2>
+        <h2 class="text-lg font-heading font-medium text-navy">Recent Users</h2>
       </div>
       <div class="divide-y divide-[#DBDBDB]">
         <% @recent_users.each do |user| %>
@@ -178,7 +178,7 @@
     <!-- Recent Leave Requests -->
     <div class="bg-white rounded-xl border border-[#DBDBDB] shadow-sm overflow-hidden">
       <div class="p-6 border-b border-[#DBDBDB]">
-        <h2 class="text-lg font-medium text-[#10223A]">Recent Leave Activity</h2>
+        <h2 class="text-lg font-heading font-medium text-navy">Recent Leave Activity</h2>
       </div>
       <div class="divide-y divide-[#DBDBDB]">
         <% if @recent_leave_requests.any? %>
