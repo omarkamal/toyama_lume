@@ -24,6 +24,15 @@
                     Remote Worker
                   </span>
                 <% end %>
+                <% if user.requires_task_tracking? %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+                    Task Tracking
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-600">
+                    Punch Only
+                  </span>
+                <% end %>
                 <span class="text-xs text-[#323233]/60">
                   <%= pluralize(user.work_zones.count, 'work zone') %>
                 </span>

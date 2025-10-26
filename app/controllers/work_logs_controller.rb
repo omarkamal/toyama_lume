@@ -49,27 +49,30 @@ class WorkLogsController < ApplicationController
       end
 
       if @work_log.save
-        # Add selected tasks
-        if params[:work_log][:task_ids].present?
-          params[:work_log][:task_ids].each do |task_id|
-            next if task_id.blank?
-            task = Task.find(task_id)
-            @work_log.work_log_tasks.create!(task: task, status: :planned)
+        # Only add tasks if user needs task tracking
+        if current_user.needs_task_tracking?
+          # Add selected tasks
+          if params[:work_log][:task_ids].present?
+            params[:work_log][:task_ids].each do |task_id|
+              next if task_id.blank?
+              task = Task.find(task_id)
+              @work_log.work_log_tasks.create!(task: task, status: :planned)
 
-            # Clear carry_forward flag from previous pending tasks when re-added
-            current_user.work_log_tasks.pending.where(task_id: task_id).update_all(carry_forward: false)
+              # Clear carry_forward flag from previous pending tasks when re-added
+              current_user.work_log_tasks.pending.where(task_id: task_id).update_all(carry_forward: false)
+            end
           end
-        end
 
-        # Add custom task if provided
-        if params[:custom_task].present?
-          custom_task = current_user.tasks.create!(
-            title: params[:custom_task],
-            category: "Custom",
-            priority: :medium,
-            is_global: false
-          )
-          @work_log.work_log_tasks.create!(task: custom_task, status: :planned)
+          # Add custom task if provided
+          if params[:custom_task].present?
+            custom_task = current_user.tasks.create!(
+              title: params[:custom_task],
+              category: "Custom",
+              priority: :medium,
+              is_global: false
+            )
+            @work_log.work_log_tasks.create!(task: custom_task, status: :planned)
+          end
         end
 
         redirect_to root_path, notice: "Successfully punched in!"
@@ -79,21 +82,26 @@ class WorkLogsController < ApplicationController
     else
       # Show modal
       @work_log = current_user.work_logs.new
-      @suggested_tasks = Task.suggested_for(current_user, limit: 4)
 
-      # Get pending tasks from previous sessions
-      @pending_tasks = current_user.pending_tasks.map(&:task).uniq
+      # Only fetch tasks if user needs task tracking
+      if current_user.needs_task_tracking?
+        @suggested_tasks = Task.suggested_for(current_user, limit: 4)
 
-      # Fallback: if no suggestions, get some popular global tasks
-      if @suggested_tasks.empty?
-        @suggested_tasks = Task.global.popular.limit(4)
+        # Get pending tasks from previous sessions
+        @pending_tasks = current_user.pending_tasks.map(&:task).uniq
+
+        # Fallback: if no suggestions, get some popular global tasks
+        if @suggested_tasks.empty?
+          @suggested_tasks = Task.global.popular.limit(4)
+        end
       end
 
       # Check if we should request mood (random weekly check)
       @should_request_mood = should_request_mood?(current_user)
 
       Rails.logger.info "Debug: Current user: #{current_user&.email}"
-      Rails.logger.info "Debug: Suggested tasks count: #{@suggested_tasks&.count}"
+      Rails.logger.info "Debug: Needs task tracking: #{current_user.needs_task_tracking?}"
+      Rails.logger.info "Debug: Suggested tasks count: #{@suggested_tasks&.count || 0}"
       Rails.logger.info "Debug: Should request mood: #{@should_request_mood}"
       render turbo_stream: turbo_stream.update("punch_in_modal", partial: "work_logs/punch_in_modal")
     end
@@ -111,6 +119,7 @@ class WorkLogsController < ApplicationController
     # Check if we should request mood (random weekly check)
     @should_request_mood = should_request_mood?(current_user)
     Rails.logger.info "Debug: Punch out - Should request mood: #{@should_request_mood}"
+    Rails.logger.info "Debug: User needs task tracking: #{current_user.needs_task_tracking?}"
     render turbo_stream: turbo_stream.update("punch_out_modal", partial: "work_logs/punch_out_modal")
   end
 
@@ -169,42 +178,45 @@ class WorkLogsController < ApplicationController
     # Handle form submission
     @work_log.update!(punch_out: Time.current, location_lat: params[:location_lat], location_lng: params[:location_lng], mood: params.dig(:work_log, :mood) || :neutral)
 
-    # Update task completion status
-    if params[:work_log_task_ids].present?
-      params[:work_log_task_ids].each do |task_id|
-        work_log_task = @work_log.work_log_tasks.find(task_id)
-        work_log_task.update!(status: :completed, duration_minutes: params[:durations][task_id])
-        work_log_task.task.increment_usage
+    # Only handle task updates if user needs task tracking
+    if current_user.needs_task_tracking?
+      # Update task completion status
+      if params[:work_log_task_ids].present?
+        params[:work_log_task_ids].each do |task_id|
+          work_log_task = @work_log.work_log_tasks.find(task_id)
+          work_log_task.update!(status: :completed, duration_minutes: params[:durations][task_id])
+          work_log_task.task.increment_usage
+        end
       end
-    end
 
-    # Mark tasks for carry forward (uncompleted tasks to add to pending)
-    if params[:carry_forward_task_ids].present?
-      params[:carry_forward_task_ids].each do |task_id|
-        work_log_task = @work_log.work_log_tasks.find(task_id)
-        work_log_task.update!(carry_forward: true)
+      # Mark tasks for carry forward (uncompleted tasks to add to pending)
+      if params[:carry_forward_task_ids].present?
+        params[:carry_forward_task_ids].each do |task_id|
+          work_log_task = @work_log.work_log_tasks.find(task_id)
+          work_log_task.update!(carry_forward: true)
+        end
       end
-    end
 
-    # Add additional tasks
-    if params[:additional_tasks].present?
-      params[:additional_tasks].each do |task_title|
-        next if task_title.blank?
+      # Add additional tasks
+      if params[:additional_tasks].present?
+        params[:additional_tasks].each do |task_title|
+          next if task_title.blank?
 
-        new_task = current_user.tasks.create!(
-          title: task_title,
-          category: "Custom",
-          priority: :medium,
-          is_global: false
-        )
+          new_task = current_user.tasks.create!(
+            title: task_title,
+            category: "Custom",
+            priority: :medium,
+            is_global: false
+          )
 
-        @work_log.work_log_tasks.create!(
-          task: new_task,
-          status: :completed,
-          duration_minutes: 30 # default duration
-        )
+          @work_log.work_log_tasks.create!(
+            task: new_task,
+            status: :completed,
+            duration_minutes: 30 # default duration
+          )
 
-        new_task.increment_usage
+          new_task.increment_usage
+        end
       end
     end
 

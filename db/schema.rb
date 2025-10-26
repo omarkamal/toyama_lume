@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_24_134659) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_26_091143) do
   create_table "leave_requests", force: :cascade do |t|
     t.datetime "approved_at"
     t.integer "approved_by_id"
@@ -48,6 +48,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_24_134659) do
     t.string "name"
     t.string "password_digest"
     t.boolean "remote", default: false, null: false
+    t.boolean "requires_task_tracking", default: false, null: false
     t.string "role"
     t.datetime "updated_at", null: false
   end

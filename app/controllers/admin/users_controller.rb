@@ -29,7 +29,7 @@ class Admin::UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :remote, :role)
+    params.require(:user).permit(:name, :email, :remote, :role, :requires_task_tracking)
   end
 
   def require_admin

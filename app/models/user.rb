@@ -20,6 +20,11 @@ class User < ApplicationRecord
     remote
   end
 
+  # Task tracking requirement
+  def needs_task_tracking?
+    requires_task_tracking
+  end
+
   # Get pending tasks from previous sessions that were marked to carry forward
   def pending_tasks
     work_log_tasks.pending.includes(:task, work_log: :user).order("work_logs.punch_in DESC")

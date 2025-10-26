@@ -24,69 +24,84 @@
           </div>
         </div>
 
-        <!-- Task Completion Review -->
-        <% if @work_log.tasks.any? %>
-          <div class="mb-6">
-            <h3 class="text-sm font-semibold text-gray-700 mb-3">Review Your Tasks</h3>
-            <div class="space-y-3">
-              <% @work_log.work_log_tasks.includes(:task).each do |work_log_task| %>
-                <div class="border rounded-lg p-3">
-                  <div class="flex items-center justify-between mb-2">
-                    <div class="flex-1">
-                      <div class="font-medium text-sm"><%= work_log_task.task.title %></div>
-                      <div class="flex items-center space-x-2 mt-1">
-                        <%= task_priority_badge(work_log_task.task.priority) %>
-                        <span class="text-xs text-gray-500"><%= work_log_task.task.category %></span>
+        <% if current_user.needs_task_tracking? %>
+          <!-- Task Completion Review -->
+          <% if @work_log.tasks.any? %>
+            <div class="mb-6">
+              <h3 class="text-sm font-semibold text-gray-700 mb-3">Review Your Tasks</h3>
+              <div class="space-y-3">
+                <% @work_log.work_log_tasks.includes(:task).each do |work_log_task| %>
+                  <div class="border rounded-lg p-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex-1">
+                        <div class="font-medium text-sm"><%= work_log_task.task.title %></div>
+                        <div class="flex items-center space-x-2 mt-1">
+                          <%= task_priority_badge(work_log_task.task.priority) %>
+                          <span class="text-xs text-gray-500"><%= work_log_task.task.category %></span>
+                        </div>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <%= check_box_tag "work_log_task_ids[]", work_log_task.id, work_log_task.completed?,
+                            class: "h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500",
+                            onchange: "toggleTaskActions(#{work_log_task.id})" %>
+                        <span class="text-xs text-gray-600">Complete</span>
                       </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                      <%= check_box_tag "work_log_task_ids[]", work_log_task.id, work_log_task.completed?,
-                          class: "h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500",
-                          onchange: "toggleTaskActions(#{work_log_task.id})" %>
-                      <span class="text-xs text-gray-600">Complete</span>
+
+                    <!-- Duration Input (shown when task is marked complete) -->
+                    <div id="duration_<%= work_log_task.id %>" class="<%= 'hidden' unless work_log_task.completed? %>">
+                      <label class="text-xs text-gray-600">Time spent (minutes):</label>
+                      <input type="number"
+                             name="durations[<%= work_log_task.id %>]"
+                             value="<%= work_log_task.duration_minutes || 60 %>"
+                             min="0"
+                             step="15"
+                             class="w-full mt-1 px-3 py-1 border rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+
+                    <!-- Carry Forward Option (shown when task is NOT marked complete) -->
+                    <div id="carry_forward_<%= work_log_task.id %>" class="<%= 'hidden' if work_log_task.completed? %> mt-2 pt-2 border-t border-gray-200">
+                      <label class="flex items-center cursor-pointer">
+                        <%= check_box_tag "carry_forward_task_ids[]", work_log_task.id, false,
+                            class: "h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" %>
+                        <span class="ml-2 text-xs text-gray-600">Add to pending tasks for later</span>
+                      </label>
                     </div>
                   </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
 
-                  <!-- Duration Input (shown when task is marked complete) -->
-                  <div id="duration_<%= work_log_task.id %>" class="<%= 'hidden' unless work_log_task.completed? %>">
-                    <label class="text-xs text-gray-600">Time spent (minutes):</label>
-                    <input type="number"
-                           name="durations[<%= work_log_task.id %>]"
-                           value="<%= work_log_task.duration_minutes || 60 %>"
-                           min="0"
-                           step="15"
-                           class="w-full mt-1 px-3 py-1 border rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
-                  </div>
-
-                  <!-- Carry Forward Option (shown when task is NOT marked complete) -->
-                  <div id="carry_forward_<%= work_log_task.id %>" class="<%= 'hidden' if work_log_task.completed? %> mt-2 pt-2 border-t border-gray-200">
-                    <label class="flex items-center cursor-pointer">
-                      <%= check_box_tag "carry_forward_task_ids[]", work_log_task.id, false,
-                          class: "h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" %>
-                      <span class="ml-2 text-xs text-gray-600">Add to pending tasks for later</span>
-                    </label>
-                  </div>
-                </div>
-              <% end %>
+          <!-- Add Additional Tasks -->
+          <div class="mb-6">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3">Add any additional tasks:</h3>
+            <div id="additional_tasks">
+              <div class="additional-task mb-2">
+                <input type="text"
+                       name="additional_tasks[]"
+                       placeholder="Task description..."
+                       class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+              </div>
+            </div>
+            <button type="button" onclick="addAdditionalTask()" class="text-xs text-indigo-600 hover:text-indigo-800">
+              + Add another task
+            </button>
+          </div>
+        <% else %>
+          <!-- Simple message for users who don't track tasks -->
+          <div class="mb-6">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div class="flex items-center space-x-2 mb-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-sm font-semibold text-blue-800">Work complete!</h3>
+              </div>
+              <p class="text-sm text-blue-700">Your work hours have been recorded. Just confirm your location to punch out.</p>
             </div>
           </div>
         <% end %>
-
-        <!-- Add Additional Tasks -->
-        <div class="mb-6">
-          <h3 class="text-sm font-semibold text-gray-700 mb-3">Add any additional tasks:</h3>
-          <div id="additional_tasks">
-            <div class="additional-task mb-2">
-              <input type="text"
-                     name="additional_tasks[]"
-                     placeholder="Task description..."
-                     class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-          </div>
-          <button type="button" onclick="addAdditionalTask()" class="text-xs text-indigo-600 hover:text-indigo-800">
-            + Add another task
-          </button>
-        </div>
 
         <!-- Location Capture (Required) -->
         <div class="mb-6">
