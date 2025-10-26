@@ -10,6 +10,12 @@ class WorkLogsController < ApplicationController
   end
 
   def punch_in
+    # Handle AJAX request for direct punch (users without task tracking)
+    if request.xhr?
+      handle_ajax_punch_in
+      return
+    end
+
     # Check if user is on approved leave today
     if current_user.leave_on_date?(Date.current)
       current_leave = current_user.current_leave
@@ -154,6 +160,12 @@ class WorkLogsController < ApplicationController
   end
 
   def complete_punch_out
+    # Handle AJAX request for direct punch (users without task tracking)
+    if request.xhr?
+      handle_ajax_punch_out
+      return
+    end
+
     @work_log = current_user.work_logs.find(params[:id])
 
     if @work_log.punch_out.present?
@@ -224,6 +236,94 @@ class WorkLogsController < ApplicationController
   end
 
   private
+
+  def handle_ajax_punch_in
+    # Check if user is on approved leave today
+    if current_user.leave_on_date?(Date.current)
+      current_leave = current_user.current_leave
+      render json: {
+        success: false,
+        error: "You're on approved leave today (#{current_leave.start_date.strftime('%B %d')} - #{current_leave.end_date.strftime('%B %d')}). You cannot punch in while on leave."
+      }
+      return
+    end
+
+    # Check if user already has an active work log
+    active_work_log = current_user.work_logs.where(punch_out: nil).first
+    if active_work_log
+      render json: { success: false, error: "You're already punched in!" }
+      return
+    end
+
+    # Validate location is present
+    if params[:location_lat].blank? || params[:location_lng].blank?
+      render json: { success: false, error: "Location is required to punch in." }
+      return
+    end
+
+    # Validate geofencing
+    unless within_work_zone?(params[:location_lat], params[:location_lng])
+      render json: { success: false, error: "You are outside of approved work zones. Please punch in from an authorized location." }
+      return
+    end
+
+    # Create work log for users who don't need task tracking
+    work_log = current_user.work_logs.new(
+      punch_in: Time.current,
+      location_lat: params[:location_lat],
+      location_lng: params[:location_lng]
+    )
+
+    if work_log.save
+      render json: {
+        success: true,
+        message: "Successfully punched in! Great to have you here!"
+      }
+    else
+      render json: {
+        success: false,
+        error: work_log.errors.full_messages.first || "Failed to punch in. Please try again."
+      }
+    end
+  end
+
+  def handle_ajax_punch_out
+    @work_log = current_user.work_logs.find(params[:id])
+
+    if @work_log.punch_out.present?
+      render json: { success: false, error: "You've already punched out!" }
+      return
+    end
+
+    # Validate location is present
+    if params[:location_lat].blank? || params[:location_lng].blank?
+      render json: { success: false, error: "Location is required to punch out." }
+      return
+    end
+
+    # Validate geofencing
+    unless within_work_zone?(params[:location_lat], params[:location_lng])
+      render json: { success: false, error: "You are outside of approved work zones. Please punch out from an authorized location." }
+      return
+    end
+
+    # Update work log for users who don't need task tracking
+    @work_log.punch_out = Time.current
+    @work_log.location_lat = params[:location_lat]
+    @work_log.location_lng = params[:location_lng]
+
+    if @work_log.save
+      render json: {
+        success: true,
+        message: "Successfully punched out! Great work today!"
+      }
+    else
+      render json: {
+        success: false,
+        error: @work_log.errors.full_messages.first || "Failed to punch out. Please try again."
+      }
+    end
+  end
 
   def within_work_zone?(lat, lng)
     # Remote workers can punch in from anywhere

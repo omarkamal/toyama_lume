@@ -348,24 +348,44 @@
   <!-- Floating Action Button -->
   <div class="fixed bottom-6 right-6 z-40">
     <% if @current_work_log %>
-      <%= button_to punch_out_work_log_path(@current_work_log),
-          method: :get,
-          class: "bg-red-500 hover:bg-red-600 text-white px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 group min-w-[120px]",
-          form: { data: { turbo_frame: "punch_out_modal" } } do %>
-        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-        <span class="text-sm font-body font-medium">Punch Out</span>
+      <% if current_user.needs_task_tracking? %>
+        <%= button_to punch_out_work_log_path(@current_work_log),
+            method: :get,
+            class: "bg-red-500 hover:bg-red-600 text-white px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 group min-w-[120px]",
+            form: { data: { turbo_frame: "punch_out_modal" } } do %>
+          <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span class="text-sm font-body font-medium">Punch Out</span>
+        <% end %>
+      <% else %>
+        <button onclick="directPunchOut('<%= @current_work_log.id %>')"
+                class="bg-red-500 hover:bg-red-600 text-white px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 group min-w-[120px]">
+          <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span class="text-sm font-body font-medium">Punch Out</span>
+        </button>
       <% end %>
     <% else %>
-      <%= button_to punch_in_work_logs_path,
-          method: :post,
-          class: "bg-lime hover:bg-lime/90 text-navy px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 group min-w-[120px]",
-          form: { data: { turbo_frame: "punch_in_modal" } } do %>
-        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-        </svg>
-        <span class="text-sm font-body font-medium">Punch In</span>
+      <% if current_user.needs_task_tracking? %>
+        <%= button_to punch_in_work_logs_path,
+            method: :get,
+            class: "bg-lime hover:bg-lime/90 text-navy px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 group min-w-[120px]",
+            form: { data: { turbo_frame: "punch_in_modal" } } do %>
+          <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+          </svg>
+          <span class="text-sm font-body font-medium">Punch In</span>
+        <% end %>
+      <% else %>
+        <button onclick="directPunchIn()"
+                class="bg-lime hover:bg-lime/90 text-navy px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 group min-w-[120px]">
+          <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+          </svg>
+          <span class="text-sm font-body font-medium">Punch In</span>
+        </button>
       <% end %>
     <% end %>
   </div>
@@ -380,3 +400,184 @@
 
 <%= turbo_frame_tag "task_modal" do %>
 <% end %>
+
+<script>
+// Direct punch functions for users who don't need task tracking
+function directPunchIn() {
+  const button = event.target.closest('button');
+  const originalContent = button.innerHTML;
+
+  // Show loading state
+  button.disabled = true;
+  button.innerHTML = `
+    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <span class="text-sm font-body font-medium">Getting location...</span>
+  `;
+
+  // Get location automatically
+  if (!navigator.geolocation) {
+    button.disabled = false;
+    button.innerHTML = originalContent;
+    showToast('error', 'Your browser does not support geolocation.');
+    return;
+  }
+
+  const options = {
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 0
+  };
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      // Location captured, proceed with punch in
+      button.innerHTML = `
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-sm font-body font-medium">Punching in...</span>
+      `;
+
+      // Send punch in request
+      fetch('<%= punch_in_work_logs_path %>', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: `location_lat=${position.coords.latitude}&location_lng=${position.coords.longitude}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('notice', data.message);
+          // Refresh the page to update the button state
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          button.disabled = false;
+          button.innerHTML = originalContent;
+          showToast('error', data.error);
+        }
+      })
+      .catch(error => {
+        button.disabled = false;
+        button.innerHTML = originalContent;
+        showToast('error', 'Failed to punch in. Please try again.');
+      });
+    },
+    function(error) {
+      button.disabled = false;
+      button.innerHTML = originalContent;
+
+      let errorMessage = 'Unable to get location. Please enable location access.';
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          errorMessage = 'Location permission denied. Please enable location access in your browser settings.';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMessage = 'Location information unavailable. Please ensure location services are enabled.';
+          break;
+        case error.TIMEOUT:
+          errorMessage = 'Location request timed out. Please try again.';
+          break;
+      }
+
+      showToast('error', errorMessage);
+    },
+    options
+  );
+}
+
+function directPunchOut(workLogId) {
+  const button = event.target.closest('button');
+  const originalContent = button.innerHTML;
+
+  // Show loading state
+  button.disabled = true;
+  button.innerHTML = `
+    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <span class="text-sm font-body font-medium">Getting location...</span>
+  `;
+
+  // Get location automatically
+  if (!navigator.geolocation) {
+    button.disabled = false;
+    button.innerHTML = originalContent;
+    showToast('error', 'Your browser does not support geolocation.');
+    return;
+  }
+
+  const options = {
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 0
+  };
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      // Location captured, proceed with punch out
+      button.innerHTML = `
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-sm font-body font-medium">Punching out...</span>
+      `;
+
+      // Send punch out request
+      fetch(`<%= complete_punch_out_work_log_path('_ID_') %>`.replace('_ID_', workLogId), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: `location_lat=${position.coords.latitude}&location_lng=${position.coords.longitude}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('notice', data.message);
+          // Refresh the page to update the button state
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          button.disabled = false;
+          button.innerHTML = originalContent;
+          showToast('error', data.error);
+        }
+      })
+      .catch(error => {
+        button.disabled = false;
+        button.innerHTML = originalContent;
+        showToast('error', 'Failed to punch out. Please try again.');
+      });
+    },
+    function(error) {
+      button.disabled = false;
+      button.innerHTML = originalContent;
+
+      let errorMessage = 'Unable to get location. Please enable location access.';
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          errorMessage = 'Location permission denied. Please enable location access in your browser settings.';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMessage = 'Location information unavailable. Please ensure location services are enabled.';
+          break;
+        case error.TIMEOUT:
+          errorMessage = 'Location request timed out. Please try again.';
+          break;
+      }
+
+      showToast('error', errorMessage);
+    },
+    options
+  );
+}
+</script>
