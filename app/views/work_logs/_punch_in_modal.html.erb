@@ -2,13 +2,19 @@
   <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
     <div class="p-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-900">Start Your Day</h2>
-        <button type="button" onclick="closePunchInModal()" class="text-gray-400 hover:text-gray-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
+         <h2 class="text-xl font-bold text-gray-900">Start Your Day</h2>
+         <button type="button" onclick="closePunchInModal()" class="text-gray-400 hover:text-gray-600">
+           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+           </svg>
+         </button>
+       </div>
+
+       <% if @work_log&.errors&.any? %>
+         <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+           <p class="text-sm text-red-700"><%= @work_log.errors.full_messages.join(', ') %></p>
+         </div>
+       <% end %>
 
       <%= form_with(url: punch_in_work_logs_path, method: :post) do |f| %>
         <% if current_user.needs_task_tracking? %>
