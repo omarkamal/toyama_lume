@@ -48,14 +48,19 @@ class WorkLogsController < ApplicationController
       end
 
       # Validate geofencing
-      unless within_work_zone?(params[:location_lat], params[:location_lng])
+      within_zone = within_work_zone?(params[:location_lat], params[:location_lng])
+      Rails.logger.info "Work zone check: lat=#{params[:location_lat]}, lng=#{params[:location_lng]}, within_zone=#{within_zone}"
+      unless within_zone
         @work_log.errors.add(:base, "You are outside of approved work zones. Please punch in from an authorized location.")
         render turbo_stream: turbo_stream.replace("punch_in_modal", partial: "work_logs/punch_in_modal")
         return
       end
 
       # IP-based location verification to detect VPNs
-      unless LocationVerificationService.new(current_user, [ params[:location_lat].to_f, params[:location_lng].to_f ], request.remote_ip).verify
+      verification_service = LocationVerificationService.new(current_user, [ params[:location_lat].to_f, params[:location_lng].to_f ], request.remote_ip)
+      verification_passes = verification_service.verify
+      Rails.logger.info "IP verification: ip=#{request.remote_ip}, passes=#{verification_passes}"
+      unless verification_passes
         @work_log.errors.add(:base, "Location verification failed. Your IP address does not match the reported location. Please check your network connection.")
         render turbo_stream: turbo_stream.replace("punch_in_modal", partial: "work_logs/punch_in_modal")
         return

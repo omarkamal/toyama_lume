@@ -15,6 +15,8 @@ class LocationVerificationService
 
     distance = calculate_distance(@reported_coordinates, ip_location)
 
+    Rails.logger.info "Location verification: reported_coords=#{@reported_coordinates}, ip_location=#{ip_location}, distance=#{distance}km, threshold=50km, passes=#{distance <= 50.kilometers}"
+
     # Flag if distance > 50km (configurable threshold)
     distance <= 50.kilometers
   end
