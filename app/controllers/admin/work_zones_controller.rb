@@ -19,6 +19,19 @@ class Admin::WorkZonesController < ApplicationController
 
   def create
     @work_zone = @user.work_zones.new(work_zone_params)
+
+    # Parse Google Maps URL if provided
+    if params[:google_maps_url].present?
+      coords = GoogleMapsParser.parse(params[:google_maps_url])
+      if coords
+        @work_zone.latitude = coords[:latitude]
+        @work_zone.longitude = coords[:longitude]
+      else
+        @work_zone.errors.add(:base, "Could not parse coordinates from Google Maps URL")
+        render :new and return
+      end
+    end
+
     if @work_zone.save
       redirect_to admin_user_path(@user), notice: "Work zone created successfully."
     else
@@ -30,7 +43,21 @@ class Admin::WorkZonesController < ApplicationController
   end
 
   def update
-    if @work_zone.update(work_zone_params)
+    @work_zone.assign_attributes(work_zone_params)
+
+    # Parse Google Maps URL if provided
+    if params[:google_maps_url].present?
+      coords = GoogleMapsParser.parse(params[:google_maps_url])
+      if coords
+        @work_zone.latitude = coords[:latitude]
+        @work_zone.longitude = coords[:longitude]
+      else
+        @work_zone.errors.add(:base, "Could not parse coordinates from Google Maps URL")
+        render :edit and return
+      end
+    end
+
+    if @work_zone.save
       redirect_to admin_user_path(@work_zone.user), notice: "Work zone updated successfully."
     else
       render :edit

@@ -1,8 +1,8 @@
 class EmployeeHandbookController < ApplicationController
   before_action :require_login
-  before_action :clear_problematic_flash, only: [:index]
+  before_action :clear_problematic_flash, only: [ :index ]
 
-  PDF_DIRECTORY = Rails.root.join('public', 'pdfs')
+  PDF_DIRECTORY = Rails.root.join("public", "pdfs")
 
   def index
     @handbook_documents = load_handbook_documents
@@ -28,7 +28,7 @@ class EmployeeHandbookController < ApplicationController
     return [] unless Dir.exist?(PDF_DIRECTORY)
 
     Dir.glob("#{PDF_DIRECTORY}/*.pdf").map do |file_path|
-      filename = File.basename(file_path, '.pdf')
+      filename = File.basename(file_path, ".pdf")
 
       # Handle new filename format: "01_introduction" -> name: "Introduction"
       match = filename.match(/^(\d+)_(.+)$/)
@@ -56,7 +56,7 @@ class EmployeeHandbookController < ApplicationController
   def find_document(document_param)
     # Decode URL-encoded filename (e.g., "0.%20Company%20Policy" -> "0. Company Policy")
     filename = URI.decode_www_form_component(document_param)
-    filename = File.basename(filename, '.pdf')
+    filename = File.basename(filename, ".pdf")
     full_path = File.join(PDF_DIRECTORY, "#{filename}.pdf")
 
     return nil unless File.exist?(full_path)
@@ -65,7 +65,7 @@ class EmployeeHandbookController < ApplicationController
   end
 
   def extract_document_number(document_param)
-    filename = File.basename(document_param, '.pdf')
+    filename = File.basename(document_param, ".pdf")
     match = filename.match(/^(\d+)/)
     match ? match[1].to_i : 999
   end
@@ -78,6 +78,6 @@ class EmployeeHandbookController < ApplicationController
   def format_display_name(filename)
     # Convert underscores back to spaces and capitalize words
     # "company_policy_handbook_overview" -> "Company Policy Handbook Overview"
-    filename.gsub(/_/, ' ').split.map(&:capitalize).join(' ')
+    filename.gsub(/_/, " ").split.map(&:capitalize).join(" ")
   end
 end

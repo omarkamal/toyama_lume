@@ -20,8 +20,24 @@
 
       <div>
         <%= f.label :name, "Location Name", class: "block text-sm font-medium text-[#10223A] mb-2" %>
-        <%= f.text_field :name, placeholder: "e.g., Main Office, Home, Client Site", class: "w-full px-4 py-2 border border-[#DBDBDB] rounded-lg focus:ring-2 focus:ring-[#226A73] focus:border-[#226A73]" %>
+        <%= f.text_field :name, placeholder: "e.g., Main Office, Home, Client Site", class: "w-full px-4 py-2 border border-[#DBDBDB] rounded-lg focus:ring-2 focus:ring-[#226A73] focus:border-[#226A73]", required: true %>
         <p class="text-xs text-[#323233]/60 mt-1">Give this location a memorable name</p>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <h3 class="text-sm font-medium text-blue-800 mb-2">📍 Option A: Paste Google Maps Link (Easiest)</h3>
+        <%= label_tag :google_maps_url, "Google Maps URL", class: "block text-sm font-medium text-blue-900 mb-2" %>
+        <%= text_field_tag :google_maps_url, nil, placeholder: "https://www.google.com/maps/@35.6762,139.6503...", class: "w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        <p class="text-xs text-blue-700 mt-1">Paste a link from Google Maps (including short links) and we'll extract the coordinates for you.</p>
+      </div>
+
+      <div class="relative py-4">
+        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+          <div class="w-full border-t border-[#DBDBDB]"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-[#323233]/60 font-medium uppercase tracking-wider">Or enter coordinates manually</span>
+        </div>
       </div>
 
       <div class="grid grid-cols-2 gap-4">

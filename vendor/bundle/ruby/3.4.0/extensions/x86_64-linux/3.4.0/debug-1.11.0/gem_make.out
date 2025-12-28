@@ -1,0 +1,19 @@
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/debug-1.11.0/ext/debug
+/usr/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/debug-1.11.0/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20251228-113436-yf8c4y sitelibdir\=./.gem.20251228-113436-yf8c4y clean
+
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/debug-1.11.0/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20251228-113436-yf8c4y sitelibdir\=./.gem.20251228-113436-yf8c4y
+compiling debug.c
+compiling iseq_collector.c
+linking shared-object debug/debug.so
+
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/debug-1.11.0/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20251228-113436-yf8c4y sitelibdir\=./.gem.20251228-113436-yf8c4y install
+/usr/bin/install -c -m 0755 debug.so ./.gem.20251228-113436-yf8c4y/debug
+
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/debug-1.11.0/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20251228-113436-yf8c4y sitelibdir\=./.gem.20251228-113436-yf8c4y clean

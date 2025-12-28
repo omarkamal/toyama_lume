@@ -9,20 +9,20 @@ class HolidaysController < ApplicationController
   private
 
   def load_holidays
-    yaml_path = Rails.root.join('config', 'holidays.yml')
+    yaml_path = Rails.root.join("config", "holidays.yml")
     return [] unless File.exist?(yaml_path)
 
     yaml_data = YAML.load_file(yaml_path)
     all_holidays = []
 
     # Add company holidays
-    if yaml_data['company_holidays']
-      yaml_data['company_holidays'].each do |holiday|
+    if yaml_data["company_holidays"]
+      yaml_data["company_holidays"].each do |holiday|
         all_holidays << {
-          name: holiday['name'],
-          date: Date.parse(holiday['date']),
-          company_only: holiday['company_only'],
-          type: holiday['company_only'] ? 'company' : 'public'
+          name: holiday["name"],
+          date: Date.parse(holiday["date"]),
+          company_only: holiday["company_only"],
+          type: holiday["company_only"] ? "company" : "public"
         }
       end
     end

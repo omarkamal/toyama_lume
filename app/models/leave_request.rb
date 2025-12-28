@@ -1,6 +1,6 @@
 class LeaveRequest < ApplicationRecord
   belongs_to :user
-  belongs_to :approved_by, class_name: 'User', optional: true
+  belongs_to :approved_by, class_name: "User", optional: true
 
   validates :start_date, presence: true
   validates :end_date, presence: true
@@ -9,7 +9,7 @@ class LeaveRequest < ApplicationRecord
   validate :no_date_conflicts, on: :create
   validate :reasonable_date_range
 
-  enum :status, { pending: 'pending', approved: 'approved', rejected: 'rejected' }, default: :pending
+  enum :status, { pending: "pending", approved: "approved", rejected: "rejected" }, default: :pending
 
   scope :for_user, ->(user) { where(user: user) }
   scope :pending, -> { where(status: :pending) }
@@ -93,23 +93,23 @@ class LeaveRequest < ApplicationRecord
   end
 
   def load_holidays
-    yaml_path = Rails.root.join('config', 'holidays.yml')
+    yaml_path = Rails.root.join("config", "holidays.yml")
     return [] unless File.exist?(yaml_path)
 
     yaml_data = YAML.load_file(yaml_path)
     holiday_dates = []
 
     # Add company holidays
-    if yaml_data['company_holidays']
-      yaml_data['company_holidays'].each do |holiday|
-        holiday_dates << Date.parse(holiday['date'])
+    if yaml_data["company_holidays"]
+      yaml_data["company_holidays"].each do |holiday|
+        holiday_dates << Date.parse(holiday["date"])
       end
     end
 
     # Add national holidays
-    if yaml_data['national_holidays_japan']
-      yaml_data['national_holidays_japan'].each do |holiday|
-        holiday_dates << Date.parse(holiday['date'])
+    if yaml_data["national_holidays_japan"]
+      yaml_data["national_holidays_japan"].each do |holiday|
+        holiday_dates << Date.parse(holiday["date"])
       end
     end
 

@@ -12,7 +12,7 @@ class User < ApplicationRecord
   has_many :work_log_tasks, through: :work_logs
   has_many :work_zones, dependent: :destroy
   has_many :leave_requests, dependent: :destroy
-  has_many :approved_leave_requests, class_name: 'LeaveRequest', foreign_key: :approved_by_id
+  has_many :approved_leave_requests, class_name: "LeaveRequest", foreign_key: :approved_by_id
 
   # Remote workers can punch in from anywhere
   # Regular employees must be within their assigned work zones
@@ -60,7 +60,7 @@ class User < ApplicationRecord
   def work_week_days
     # Default: Monday to Friday (1-5, where 0 = Sunday, 6 = Saturday)
     # Can be configured to Monday to Saturday in config/initializers/leave_settings.rb
-    [1, 2, 3, 4, 5] # Monday-Friday
+    [ 1, 2, 3, 4, 5 ] # Monday-Friday
   end
 
   def weekend_day?(date)

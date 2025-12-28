@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_26_091143) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_28_000001) do
   create_table "leave_requests", force: :cascade do |t|
     t.datetime "approved_at"
     t.integer "approved_by_id"
@@ -68,6 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_26_091143) do
 
   create_table "work_logs", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "ip_address"
     t.decimal "location_lat"
     t.decimal "location_lng"
     t.string "mood"

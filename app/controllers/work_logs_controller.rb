@@ -54,6 +54,14 @@ class WorkLogsController < ApplicationController
         return
       end
 
+      # IP-based location verification to detect VPNs
+      unless LocationVerificationService.new(current_user, [ params[:location_lat].to_f, params[:location_lng].to_f ], request.remote_ip).verify
+        @work_log.errors.add(:base, "Location verification failed. Your IP address does not match the reported location. Please check your network connection.")
+        render turbo_stream: turbo_stream.replace("punch_in_modal", partial: "work_logs/punch_in_modal")
+        return
+      end
+
+      @work_log.ip_address = request.remote_ip
       if @work_log.save
         # Only add tasks if user needs task tracking
         if current_user.needs_task_tracking?
@@ -187,8 +195,15 @@ class WorkLogsController < ApplicationController
       return
     end
 
+    # IP-based location verification to detect VPNs
+    unless LocationVerificationService.new(current_user, [ params[:location_lat].to_f, params[:location_lng].to_f ], request.remote_ip).verify
+      @work_log.errors.add(:base, "Location verification failed. Your IP address does not match the reported location. Please check your network connection.")
+      render turbo_stream: turbo_stream.replace("punch_out_modal", partial: "work_logs/punch_out_modal")
+      return
+    end
+
     # Handle form submission
-    @work_log.update!(punch_out: Time.current, location_lat: params[:location_lat], location_lng: params[:location_lng], mood: params.dig(:work_log, :mood) || :neutral)
+    @work_log.update!(punch_out: Time.current, location_lat: params[:location_lat], location_lng: params[:location_lng], mood: params.dig(:work_log, :mood) || :neutral, ip_address: request.remote_ip)
 
     # Only handle task updates if user needs task tracking
     if current_user.needs_task_tracking?
@@ -267,11 +282,18 @@ class WorkLogsController < ApplicationController
       return
     end
 
+    # IP-based location verification to detect VPNs
+    unless LocationVerificationService.new(current_user, [ params[:location_lat].to_f, params[:location_lng].to_f ], request.remote_ip).verify
+      render json: { success: false, error: "Location verification failed. Your IP address does not match the reported location. Please check your network connection." }
+      return
+    end
+
     # Create work log for users who don't need task tracking
     work_log = current_user.work_logs.new(
       punch_in: Time.current,
       location_lat: params[:location_lat],
-      location_lng: params[:location_lng]
+      location_lng: params[:location_lng],
+      ip_address: request.remote_ip
     )
 
     if work_log.save
@@ -307,10 +329,17 @@ class WorkLogsController < ApplicationController
       return
     end
 
+    # IP-based location verification to detect VPNs
+    unless LocationVerificationService.new(current_user, [ params[:location_lat].to_f, params[:location_lng].to_f ], request.remote_ip).verify
+      render json: { success: false, error: "Location verification failed. Your IP address does not match the reported location. Please check your network connection." }
+      return
+    end
+
     # Update work log for users who don't need task tracking
     @work_log.punch_out = Time.current
     @work_log.location_lat = params[:location_lat]
     @work_log.location_lng = params[:location_lng]
+    @work_log.ip_address = request.remote_ip
 
     if @work_log.save
       render json: {

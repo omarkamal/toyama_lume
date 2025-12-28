@@ -266,9 +266,19 @@
       </nav>
     <% end %>
 
-    <main>
+    <main class="flex-grow">
       <%= yield %>
     </main>
+
+    <% if logged_in? %>
+      <footer class="bg-white border-t border-cloudy py-6 mb-16 sm:mb-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p class="text-xs text-carbon-heavy/40 font-body font-light tracking-wider uppercase">
+            Toyama Lume &bull; Build 95120bd
+          </p>
+        </div>
+      </footer>
+    <% end %>
 
     <!-- Toast Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>

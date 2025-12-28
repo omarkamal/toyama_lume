@@ -74,7 +74,7 @@ Rails.application.routes.draw do
         post :toggle_global
       end
     end
-    resources :leave_requests, only: [:index, :show] do
+    resources :leave_requests, only: [ :index, :show ] do
       collection do
         post :bulk_approve
         post :bulk_reject

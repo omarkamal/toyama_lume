@@ -1,7 +1,7 @@
 class LeaveRequestsController < ApplicationController
   before_action :require_login
-  before_action :set_leave_request, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_admin!, only: [:approve, :reject]
+  before_action :set_leave_request, only: [ :show, :edit, :update, :destroy ]
+  before_action :authorize_admin!, only: [ :approve, :reject ]
 
   def index
     @leave_requests = current_user.leave_requests.includes(:approved_by)

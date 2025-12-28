@@ -90,8 +90,8 @@ GEM
     brakeman (7.1.0)
       racc
     builder (3.3.0)
-    bundler-audit (0.9.2)
-      bundler (>= 1.2.0, < 3)
+    bundler-audit (0.9.3)
+      bundler (>= 1.2.0)
       thor (~> 1.0)
     capybara (3.40.0)
       addressable
@@ -127,6 +127,10 @@ GEM
     fugit (1.12.1)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
+    geokit (1.14.0)
+    geokit-rails (2.5.0)
+      geokit (~> 1.5)
+      rails (>= 3.0)
     globalid (1.3.0)
       activesupport (>= 6.1)
     i18n (1.14.7)
@@ -403,6 +407,7 @@ DEPENDENCIES
   bundler-audit
   capybara
   debug
+  geokit-rails (~> 2.5)
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
@@ -424,4 +429,4 @@ DEPENDENCIES
   web-console
 
 BUNDLED WITH
-   2.7.2
+  4.0.2

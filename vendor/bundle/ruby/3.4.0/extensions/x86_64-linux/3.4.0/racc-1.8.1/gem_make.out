@@ -1,0 +1,18 @@
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+/usr/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20251228-113436-f3eqeo sitelibdir\=./.gem.20251228-113436-f3eqeo clean
+
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20251228-113436-f3eqeo sitelibdir\=./.gem.20251228-113436-f3eqeo
+compiling cparse.c
+linking shared-object racc/cparse.so
+
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20251228-113436-f3eqeo sitelibdir\=./.gem.20251228-113436-f3eqeo install
+/usr/bin/install -c -m 0755 cparse.so ./.gem.20251228-113436-f3eqeo/racc
+
+current directory: /home/omar/Dev/toyama/omar/toyama_lume/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20251228-113436-f3eqeo sitelibdir\=./.gem.20251228-113436-f3eqeo clean

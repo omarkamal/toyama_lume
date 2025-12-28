@@ -13,7 +13,7 @@ class CreateLeaveRequests < ActiveRecord::Migration[8.1]
     end
 
     add_index :leave_requests, :status
-    add_index :leave_requests, [:user_id, :start_date]
-    add_index :leave_requests, [:user_id, :status]
+    add_index :leave_requests, [ :user_id, :start_date ]
+    add_index :leave_requests, [ :user_id, :status ]
   end
 end
