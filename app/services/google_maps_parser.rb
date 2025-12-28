@@ -68,6 +68,29 @@ class GoogleMapsParser
       return { latitude: $1.to_f, longitude: $2.to_f }
     end
 
+    # Pattern 4: Look for coordinates in the URL query parameters
+    begin
+      query_params = URI.parse(url).query
+      if query_params
+        # Try to decode and find coordinates
+        decoded = URI.decode_www_form(query_params).to_h rescue {}
+        if decoded['q'] && decoded['q'] =~ /(-?\d+\.\d+),\s*(-?\d+\.\d+)/
+          return { latitude: $1.to_f, longitude: $2.to_f }
+        end
+      end
+    rescue
+      # Ignore URI parsing errors
+    end
+
+    # Pattern 5: Direct coordinate search in HTML (most basic)
+    if html =~ /(\d{2}\.\d{6}),(\d{2}\.\d{6})/
+      lat, lng = $1.to_f, $2.to_f
+      # Basic validation - latitude should be between -90 and 90, longitude between -180 and 180
+      if lat.between?(-90, 90) && lng.between?(-180, 180)
+        return { latitude: lat, longitude: lng }
+      end
+    end
+
     nil
   rescue StandardError => e
     Rails.logger.error "GoogleMapsParser HTML extraction error: #{e.message}"
